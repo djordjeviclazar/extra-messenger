@@ -21,6 +21,17 @@ namespace ExtraMessenger
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            // CORS
+            services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+            builder
+            .WithOrigins("https://localhost:5001/", "https://localhost:5001", "http://localhost:5000/",
+                "http://localhost:4200/", "https://localhost:4200/", "http://localhost:4200")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials()
+            ));
+
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -51,6 +62,8 @@ namespace ExtraMessenger
 
             app.UseRouting();
 
+            app.UseCors("CorsPolicy");
+                    
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
