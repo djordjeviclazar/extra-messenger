@@ -5,7 +5,7 @@ import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 
 export function getBaseUrl() {
-  return document.getElementsByTagName('base')[0].href;
+  return "https://localhost:5001/";
 }
 
 const providers = [
@@ -19,4 +19,4 @@ if (environment.production) {
 platformBrowserDynamic(providers).bootstrapModule(AppModule)
   .catch(err => console.log(err));
 
-export { renderModule, renderModuleFactory } from '@angular/platform-server';
+//export { renderModule, renderModuleFactory } from '@angular/platform-server';
