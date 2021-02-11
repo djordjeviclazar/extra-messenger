@@ -1,9 +1,9 @@
 <header>
   <nav
-    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
+    class="purple-nav navbar navbar-expand-sm navbar-toggleable-sm box-shadow"
   >
+    <a class="navbar-brand" [routerLink]="['/']"><img src="../../assets/logo.png" class="img-fluid" /></a>
     <div class="container">
-      <a class="navbar-brand" [routerLink]="['/']">ExtraMessenger</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -21,20 +21,20 @@
       >
         <ul class="navbar-nav flex-grow">
           <li
-            class="nav-item"
+            class="nav-item mr-2"
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
+            <button class="btn btn-outline-success text-white strong" [routerLink]="['/']">Home</button>
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
+          <li class="nav-item mr-2" [routerLinkActive]="['link-active']">
+            <button class="btn btn-outline-success text-white strong" [routerLink]="['/counter']"
+              >Login</button
             >
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
+            <button class="btn btn-outline-success text-white strong" [routerLink]="['/fetch-data']"
+              >Register</button
             >
           </li>
         </ul>
