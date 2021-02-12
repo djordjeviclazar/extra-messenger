@@ -27,8 +27,8 @@
           >
             <button class="btn btn-outline-success text-white strong" [routerLink]="['/']">Home</button>
           </li>
-          <li class="nav-item mr-2" [routerLinkActive]="['link-active']">
-            <button class="btn btn-outline-success text-white strong" [routerLink]="['/counter']"
+          <li class="nav-item mr-2">
+            <button class="btn btn-outline-success text-white strong" (click)="openLoginDialog()"
               >Login</button
             >
           </li>
