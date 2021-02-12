@@ -1,1 +1,15 @@
-<p>sidebar works!</p>
+<div class="text-center mr-2">
+    <h4 class="text-warning">Contacts</h4>
+    <hr />
+    <ng-container *ngIf="(contacts$ | async) as contacts">
+        <div style="overflow: scroll; overflow-x: hidden; max-height: 630px;">
+            <div *ngFor="let contact of contacts">
+                <div (click)="openThread(contact.chatInteractionId, contact.userId, contact.name)" class="contact row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary">
+                    <img class="chatUser-image ml-1" style="margin-top: 1px;"
+                        src="{{contact.mainPhotoUrl ? contact.mainPhotoUrl : '../../../assets/images/default-profile-image.jpg'}}">
+                    <div class="ml-2 mt-3"> <strong> {{ contact.name | titlecase }} </strong> </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>
