@@ -32,11 +32,11 @@ import { LoginComponent } from "./login/login.component";
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
+      { path: '', component: HomeComponent, pathMatch: 'full' },
       {
-        path: '',
+        path: 'chat',
         loadChildren: () => import('./chat/chat.module').then(m => m.ChatModule)
       },
-      // { path: '', component: HomeComponent, pathMatch: 'full' },),
     ]),
     BrowserAnimationsModule,
     MatFormFieldModule,
