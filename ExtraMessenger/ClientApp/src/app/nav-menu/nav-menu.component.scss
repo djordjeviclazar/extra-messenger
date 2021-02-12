@@ -25,7 +25,7 @@ html {
 
 .custom-toggler.navbar-toggler {
   border-color: #36ff37;
-} 
+}
 
 .purple-nav {
   background-color: #9c27b0;
@@ -41,5 +41,11 @@ html {
 }
 
 .btn-outline-success {
-  @include button-outline-variant(#36ff37, #ffffff, lighten(#367437,5%), #367437);
+  color: white !important;
+  @include button-outline-variant(#69F0AE, #ffffff, lighten(#69F0AE,5%), #69F0AE);
+}
+
+.btn-outline-success:hover {
+  color: #424242 !important;
+  @include button-outline-variant(#69F0AE, #424242, lighten(#69F0AE,5%), #69F0AE);
 }

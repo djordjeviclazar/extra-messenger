@@ -25,15 +25,15 @@
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <button class="btn btn-outline-success text-white strong" [routerLink]="['/']">Home</button>
+            <button class="btn btn-outline-success strong" [routerLink]="['/']">Home</button>
           </li>
-          <li class="nav-item mr-2" [routerLinkActive]="['link-active']">
-            <button class="btn btn-outline-success text-white strong" [routerLink]="['/counter']"
+          <li class="nav-item mr-2">
+            <button class="btn btn-outline-success strong" (click)="openLoginDialog()"
               >Login</button
             >
           </li>
           <li class="nav-item" [routerLinkActive]="['link-active']">
-            <button class="btn btn-outline-success text-white strong" [routerLink]="['/fetch-data']"
+            <button class="btn btn-outline-success strong" [routerLink]="['/fetch-data']"
               >Register</button
             >
           </li>
