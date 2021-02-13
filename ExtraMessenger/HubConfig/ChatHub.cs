@@ -6,14 +6,15 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using ExtraMessenger.DTOs;
+using MongoDB.Bson;
 
 namespace ExtraMessenger.Hubs
 {
     // [Authorize]
     public class ChatHub : Hub
     {
-        private readonly static ConnectionMapping<string> _connections =
-            new ConnectionMapping<string>();
+        private readonly static ConnectionMapping<ObjectId> _connections =
+            new ConnectionMapping<ObjectId>();
 
         private readonly IConfiguration _config;
 
@@ -22,7 +23,7 @@ namespace ExtraMessenger.Hubs
             _config = config;
         }
 
-        public async Task SendMessage(string reciever, SendingMessageDTO message)
+        public async Task SendMessage(ObjectId reciever, SendingMessageDTO message)
         {
             //Laza Comes Here
             var userConnections = _connections.GetConnections(reciever);
@@ -36,18 +37,18 @@ namespace ExtraMessenger.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            string username = Context.User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId user = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            _connections.Add(username, Context.ConnectionId);
+            _connections.Add(user, Context.ConnectionId);
 
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            string username = Context.User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId user = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            _connections.Remove(username, Context.ConnectionId);
+            _connections.Remove(user, Context.ConnectionId);
 
             await base.OnDisconnectedAsync(ex);
         }

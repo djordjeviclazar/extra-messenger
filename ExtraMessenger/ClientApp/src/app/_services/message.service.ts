@@ -10,9 +10,9 @@ export class MessageService {
   _message: string = '';
   _hubConnection: signalR.HubConnection;
   _receivers: any[] = [];
-  messageThread = new BehaviorSubject<{ recieverId: number, chatInteractionId: number, senderName: string }>({
-    recieverId: -2,
-    chatInteractionId: -2,
+  messageThread = new BehaviorSubject<{ recieverId: string, chatInteractionId: string, senderName: string }>({
+    recieverId: "-2",
+    chatInteractionId: "-2",
     senderName: ''
   });
   messageArrived = new BehaviorSubject<any>({
@@ -21,8 +21,8 @@ export class MessageService {
     senderUsername: '',
     receiverUsername: '',
     seen: true,
-    senderId: -1,
-    recieverId: -1
+    senderId: "-1",
+    recieverId: "-1"
   });
 
   public startConnection = () => {
