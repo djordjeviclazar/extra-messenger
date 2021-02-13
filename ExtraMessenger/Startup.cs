@@ -1,3 +1,4 @@
+using ExtraMessenger.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -5,6 +6,8 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace ExtraMessenger
 {
@@ -37,6 +40,14 @@ namespace ExtraMessenger
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            //MongoDB:
+            services.Configure<MongoDBSettings>(Configuration.GetSection("MongoDBSettings"));
+
+            services.AddSingleton<IMongoDBSettings>(sp => sp.GetRequiredService<IOptions<MongoDBSettings>>().Value);
+
+            services.AddSingleton<MongoService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
