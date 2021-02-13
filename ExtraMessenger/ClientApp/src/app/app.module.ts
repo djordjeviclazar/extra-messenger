@@ -19,6 +19,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { LoginComponent } from "./login/login.component";
 import { RegisterComponent } from './register/register.component';
+import { AuthGuard } from './_services/_guards/auth.guard';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { RegisterComponent } from './register/register.component';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       {
         path: 'chat',
-        loadChildren: () => import('./chat/chat.module').then(m => m.ChatModule)
+        loadChildren: () => import('./chat/chat.module').then(m => m.ChatModule),
+        canActivate: [AuthGuard]
       },
     ]),
     BrowserAnimationsModule,

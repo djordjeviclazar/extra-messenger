@@ -24,7 +24,7 @@ namespace ExtraMessenger.Services.Authentication
             var db = _mongoService.GetDb;
             var userCollection = db.GetCollection<User>("Users");
 
-            var filter = Builders<User>.Filter.Eq("username", username);
+            var filter = Builders<User>.Filter.Eq("Username", username);
 
             var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
 
@@ -59,7 +59,7 @@ namespace ExtraMessenger.Services.Authentication
             var db = _mongoService.GetDb;
             var userCollection = db.GetCollection<User>("Users");
 
-            var filter = Builders<User>.Filter.Eq("username", username);
+            var filter = Builders<User>.Filter.Eq("Username", username);
 
             var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
 

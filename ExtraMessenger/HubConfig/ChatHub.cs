@@ -12,8 +12,8 @@ namespace ExtraMessenger.Hubs
     // [Authorize]
     public class ChatHub : Hub
     {
-        private readonly static ConnectionMapping<int> _connections =
-            new ConnectionMapping<int>();
+        private readonly static ConnectionMapping<string> _connections =
+            new ConnectionMapping<string>();
 
         private readonly IConfiguration _config;
 
@@ -22,10 +22,10 @@ namespace ExtraMessenger.Hubs
             _config = config;
         }
 
-        public async Task SendMessage(int recieverId, SendingMessageDTO message)
+        public async Task SendMessage(string reciever, SendingMessageDTO message)
         {
             //Laza Comes Here
-            var userConnections = _connections.GetConnections(recieverId);
+            var userConnections = _connections.GetConnections(reciever);
 
             foreach (var connectionId in userConnections)
             {
@@ -36,18 +36,18 @@ namespace ExtraMessenger.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            int userId = int.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            string username = Context.User.FindFirst(ClaimTypes.Name).Value;
 
-            _connections.Add(userId, Context.ConnectionId);
+            _connections.Add(username, Context.ConnectionId);
 
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            int userId = int.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            string username = Context.User.FindFirst(ClaimTypes.Name).Value;
 
-            _connections.Remove(userId, Context.ConnectionId);
+            _connections.Remove(username, Context.ConnectionId);
 
             await base.OnDisconnectedAsync(ex);
         }

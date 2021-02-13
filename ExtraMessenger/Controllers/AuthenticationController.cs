@@ -57,8 +57,9 @@ namespace ExtraMessenger.Controllers
         {
             var result = await _authenticationService.Register(userRegisterInfo.Username, userRegisterInfo.Password);
             if (!result)
-                return BadRequest(new { Status = false, Message = $"User {userRegisterInfo.Username} already exists." });
-            return Ok(new { Status = true });
+                return BadRequest(new { Status = true, Message = $"User '{userRegisterInfo.Username}' already exists." });
+
+            return Ok(new { Status = true, Token = GenerateToken(userRegisterInfo) });
         }
 
         private string GenerateToken(UserRegisterLoginDTO authenticatedUser)

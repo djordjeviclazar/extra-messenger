@@ -53,12 +53,16 @@ export class RegisterComponent implements OnInit {
         } else {
           this._alertifyService.success(loginResponse.message ?? "Registration successful. Logging in...");
           this.dialogRef.close();
+          localStorage.setItem('authToken', response.token);
           this._router.navigate(["/chat"]);
           this._alertifyService.success(loginResponse.message ?? "Successfully logged in");
         }
       },
         error => {
-          this._alertifyService.error("Unknown error.");
+          if (error.error && error.error?.message !== '')
+            this._alertifyService.error(error.error.message);
+          else
+            this._alertifyService.error("Unknown error.");
           console.log(error.message);
         }
       )).subscribe();
