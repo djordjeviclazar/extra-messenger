@@ -28,7 +28,7 @@ namespace ExtraMessenger.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserRegisterLoginDto userLoginInfo)
+        public async Task<IActionResult> Login(UserRegisterLoginDTO userLoginInfo)
         {
             bool result;
             string message;
@@ -52,7 +52,7 @@ namespace ExtraMessenger.Controllers
             return Ok(new { Status = result, Message = message, Token = jwt });
         }
 
-        private string GenerateToken(UserRegisterLoginDto authenticatedUser)
+        private string GenerateToken(UserRegisterLoginDTO authenticatedUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Secret").Value);

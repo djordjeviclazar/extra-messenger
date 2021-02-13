@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ExtraMessenger.DTOs
 {
-    public class UserRegisterLoginDto
+    public class UserRegisterLoginDTO
     {
         [Required]
         public string Username { get; set; }
