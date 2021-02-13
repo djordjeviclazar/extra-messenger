@@ -52,6 +52,12 @@ namespace ExtraMessenger.Controllers
             return Ok(new { Status = result, Message = message, Token = jwt });
         }
 
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UserRegisterLoginDTO userRegisterInfo)
+        {
+            return Ok(new { Status = true });
+        }
+
         private string GenerateToken(UserRegisterLoginDTO authenticatedUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

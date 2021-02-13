@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { tap } from 'rxjs/operators';
 import { isNullOrUndefined } from 'util';
+import { AlertifyService } from '../_services/alertify.service';
+import { AuthService } from '../_services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -14,6 +18,9 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private _formBuilder: FormBuilder,
+    private _authService: AuthService,
+    private _alertifyService: AlertifyService,
+    private _router: Router,
     public dialogRef: MatDialogRef<RegisterComponent>
   ) {
   }
@@ -34,7 +41,27 @@ export class RegisterComponent implements OnInit {
   }
 
   register() {
-
+    if (!this.registerForm.valid)
+      return;
+    const userRegisterFormValue = Object.assign({}, this.registerForm.value);
+    const userRegisterDto = Object.assign({ username: userRegisterFormValue.username, password: userRegisterFormValue.password });
+    this._authService.register(userRegisterDto).pipe(
+      tap((response: any) => {
+        const loginResponse = Object.assign({}, response);
+        if (!loginResponse.status) {
+          this._alertifyService.error(loginResponse.message ?? "Invalid username/password combination.");
+        } else {
+          this._alertifyService.success(loginResponse.message ?? "Registration successful. Logging in...");
+          this.dialogRef.close();
+          this._router.navigate(["/chat"]);
+          this._alertifyService.success(loginResponse.message ?? "Successfully logged in");
+        }
+      },
+        error => {
+          this._alertifyService.error("Unknown error.");
+          console.log(error.message);
+        }
+      )).subscribe();
   }
 
   cancel() {
