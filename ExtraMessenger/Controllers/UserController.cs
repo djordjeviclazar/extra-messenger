@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using ExtraMessenger.DTOs;
+using System.Security.Claims;
 
 namespace ExtraMessenger.Controllers
 {
@@ -27,6 +28,8 @@ namespace ExtraMessenger.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
         {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
             var db = _mongoService.GetDb;
 
             var userCollection = db.GetCollection<User>("Users");
@@ -35,7 +38,7 @@ namespace ExtraMessenger.Controllers
 
             var usersList = await users.ToListAsync();
 
-            var usersToReturn = usersList.Select(user => 
+            var usersToReturn = usersList.Where(user => user.Id != currentUser).Select(user => 
             new UserDTO 
             { 
                 ObjectId = user.Id.ToString(), 
