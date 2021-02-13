@@ -1,6 +1,6 @@
 <div class="text-center mr-2">
-    <h4 class="text-warning">Contacts</h4>
-    <hr />
+    <h2 class="text-orange">Contacts</h2>
+    <mat-divider></mat-divider>
     <ng-container *ngIf="(contacts$ | async) as contacts">
         <div style="overflow: scroll; overflow-x: hidden; max-height: 630px;">
             <div *ngFor="let contact of contacts">

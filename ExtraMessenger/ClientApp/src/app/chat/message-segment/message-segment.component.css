@@ -1,5 +1,6 @@
 .message-thread {
-    border: 1px solid rgba(1, 73, 136, 0.3);
+  border: 1px solid rgba(1, 73, 136, 0.3);
+  background-color: #242526;
 }
 
 .message-input {

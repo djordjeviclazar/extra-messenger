@@ -4,6 +4,7 @@ import { MessageSegmentComponent } from './message-segment/message-segment.compo
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { ChatComponent } from './chat.component';
 import { RouterModule } from '@angular/router';
+import { MatDividerModule } from '@angular/material/divider'; 
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     CommonModule,
+    MatDividerModule,
     RouterModule.forChild([
       { path: '', component: ChatComponent, pathMatch: 'full' },
     ])]

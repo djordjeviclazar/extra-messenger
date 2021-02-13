@@ -20,6 +20,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { LoginComponent } from "./login/login.component";
 import { RegisterComponent } from './register/register.component';
 import { AuthGuard } from './_services/_guards/auth.guard';
+import { MatDividerModule } from '@angular/material/divider'; 
+
 
 @NgModule({
   declarations: [
@@ -51,7 +53,9 @@ import { AuthGuard } from './_services/_guards/auth.guard';
     ReactiveFormsModule,
     MatTooltipModule,
     MatDialogModule,
-    MatCheckboxModule],
+    MatCheckboxModule,
+    MatDividerModule
+  ],
     providers: [],
     bootstrap: [AppComponent]
   })
