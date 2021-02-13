@@ -1,9 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MessageService } from './services/message.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'app';
+
+  constructor(
+    private _messageService: MessageService
+  ) {
+
+  }
+
+  ngOnInit(): void {
+    this._messageService.startConnection();
+    this._messageService.addRecievedMessageListener();
+  }
+
+  ngOnDestroy(): void {
+    this._messageService.disconnect();
+  }
+
 }

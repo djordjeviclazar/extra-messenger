@@ -1,11 +1,11 @@
 <header>
   <nav
-    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
+    class="purple-nav navbar navbar-expand-sm navbar-toggleable-sm box-shadow"
   >
+    <a class="navbar-brand" [routerLink]="['/']"><img src="../../assets/logo.png" class="img-fluid" /></a>
     <div class="container">
-      <a class="navbar-brand" [routerLink]="['/']">ExtraMessenger</a>
       <button
-        class="navbar-toggler"
+        class="navbar-toggler custom-toggler"
         type="button"
         data-toggle="collapse"
         data-target=".navbar-collapse"
@@ -13,7 +13,7 @@
         [attr.aria-expanded]="isExpanded"
         (click)="toggle()"
       >
-        <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon navbar-light"></span>
       </button>
       <div
         class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse"
@@ -21,20 +21,20 @@
       >
         <ul class="navbar-nav flex-grow">
           <li
-            class="nav-item"
+            class="nav-item mr-2"
             [routerLinkActive]="['link-active']"
             [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
+            <button class="btn btn-outline-success strong" [routerLink]="['/']">Home</button>
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
+          <li class="nav-item mr-2">
+            <button class="btn btn-outline-success strong" (click)="openLoginDialog()"
+              >Login</button
             >
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
+          <li class="nav-item">
+            <button class="btn btn-outline-success strong" (click)="openRegisterDialog()"
+              >Register</button
             >
           </li>
         </ul>

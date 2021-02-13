@@ -1,0 +1,160 @@
+@import "bootstrap";
+
+.center-title {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-shadow: -1px -1px 0 rgb(69, 69, 69), 1px -1px 0 rgb(69, 69, 69), -1px 1px 0 rgb(69, 69, 69), 1px 1px 0 rgb(69, 69, 69);
+}
+
+
+.center-search {
+  position: fixed;
+  top: 150%;
+  left: 70%;
+  transform: translate(-50%, -50%);
+  padding: 2% 5% 2% 5%;
+  background-color: rgba(211,211,211,0.6);
+  text-shadow: -1px -1px 0 rgb(69, 69, 69), 1px -1px 0 rgb(69, 69, 69), -1px 1px 0 rgb(69, 69, 69), 1px 1px 0 rgb(69, 69, 69);
+}
+
+.lead {
+  text-align: center;
+  color: white;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+/* .languageOptions {
+  float: right;
+} */
+
+.lng-btn {
+  width: 30px;
+  height: 15px;
+  border: 0px;
+  padding: 0px;
+  margin-right: 10px;
+  margin-top: 5px;
+  float: right;
+}
+
+.login-button {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.login-spinner {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
+}
+
+.lead-title {
+  text-align: center;
+  color: white;
+}
+
+.lead-button {
+  color: white;
+  border-width: 2px;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.btn-outline-warning {
+  @include button-outline-variant(#ff7d27, #ffffff, lighten(#ff7d27,5%), #ff7d27);
+}
+
+.nav-options {
+  width: inherit;
+}
+
+.nav-option {
+  font-weight: bolder;
+  font-size: 1em;
+  margin-top: 3%;
+}
+
+.main-logo {
+  min-width: 150px;
+  min-height: 45px;
+  width: 25%;
+  height: 10%;
+}
+
+#background-video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  min-width: 100%;
+  min-height: 100%;
+  z-index: -1;
+  opacity: 0.9;
+}
+
+.img-logo {
+  width: 25%;
+  height: 10%;
+}
+
+.register-button {
+  font-weight: bolder;
+  font-size: medium;
+  color: white;
+}
+
+.profile-btn {
+  margin-top: 20%;
+  margin-bottom: 20%;
+}
+
+
+/* backdrop color for future
+.light-blue-backdrop {
+  background-color: #5cb3fd;
+}
+*/
+
+@media only screen and (max-width: 600px) {
+  body {
+    font-size: 10px;
+  }
+
+  .lead {
+    color: white;
+    border-width: 2px;
+    font-size: 1em;
+    font-weight: 600;
+  }
+}
+
+.wrapper {
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  perspective: 2px;
+  scroll-behavior: smooth;
+}
+
+.content-placeholder {
+  height: 100vh;
+  margin-top: 96.5vh;
+  background-size: 100vh;
+  background-repeat: no-repeat;
+}
+
+.row {
+  width: 38vw;
+}
+
+.home-search-btn {
+  display: inline-block;
+  width: fit-content;
+}
+
+.form-group {
+  width: 130%;
+}

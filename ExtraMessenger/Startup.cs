@@ -1,11 +1,16 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using ExtraMessenger.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using ExtraMessenger.Hubs;
+using System.Threading.Tasks;
+using ExtraMessenger.Services.Authentication.Interfaces;
+using ExtraMessenger.Services.Authentication;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -20,23 +25,21 @@ namespace ExtraMessenger
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllers();
 
-            // CORS
             services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
             builder
-            .WithOrigins("https://localhost:5001/", "https://localhost:5001", "http://localhost:5000/",
-                "http://localhost:4200/", "https://localhost:4200/", "http://localhost:4200")
+            .WithOrigins("http://localhost:4200", "http://localhost:4201")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()
             ));
 
-            // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
+
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddAuthentication(options =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
@@ -48,9 +51,40 @@ namespace ExtraMessenger
 
             services.AddSingleton<MongoService>();
 
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                   .AddJwtBearer(options =>
+                   {
+                       options.TokenValidationParameters = new TokenValidationParameters
+                       {
+                           ValidateIssuerSigningKey = true,
+                           IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:Secret").Value)),
+                           ValidateIssuer = false,
+                           ValidateAudience = false
+                       };
+                       options.Events = new JwtBearerEvents
+                       {
+                           OnMessageReceived = context =>
+                           {
+                               var accessToken = context.Request.Query["access_token"];
+
+                               // If the request is for our hub...
+                               var path = context.HttpContext.Request.Path;
+                               if (!string.IsNullOrEmpty(accessToken) &&
+                                   (path.StartsWithSegments("/chat")))
+                               {
+                                   // Read the token out of the query string
+                                   context.Token = accessToken;
+                               }
+                               return Task.CompletedTask;
+                           }
+                       };
+                   });
+
+            services.AddSignalR();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -59,40 +93,37 @@ namespace ExtraMessenger
             }
             else
             {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                //Global exception handler
+                // app.UseExceptionHandler(builder =>
+                // {
+                //     builder.Run(async context =>
+                //     { //context refers to Http context
+                //         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                //         var error = context.Features.Get<IExceptionHandlerFeature>();
+                //         if (error != null)
+                //         {
+                //             context.Response.AddApplicationError(error.Error.Message);
+                //             await context.Response.WriteAsync(error.Error.Message);
+                //         }
+                //     });
+                // });
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseCors("CorsPolicy");
-                    
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });
-
-            app.UseSpa(spa =>
-            {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200"); 
-                }
+                endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
             });
         }
     }

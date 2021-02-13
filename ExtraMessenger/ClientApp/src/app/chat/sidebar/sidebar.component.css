@@ -1,0 +1,10 @@
+.chatUser-image {
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+}
+
+.contact:hover {
+    background-color: rgba(2,117,216,0.2);
+    cursor: pointer;
+}

@@ -1,0 +1,51 @@
+@import "bootstrap";
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+.custom-toggler.navbar-toggler {
+  border-color: #36ff37;
+}
+
+.purple-nav {
+  background-color: #9c27b0;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  z-index: 10000;
+}
+
+.img-fluid {
+    max-width: 300px;
+    width:100%;
+}
+
+.btn-outline-success {
+  color: white !important;
+  @include button-outline-variant(#69F0AE, #ffffff, lighten(#69F0AE,5%), #69F0AE);
+}
+
+.btn-outline-success:hover {
+  color: #424242 !important;
+  @include button-outline-variant(#69F0AE, #424242, lighten(#69F0AE,5%), #69F0AE);
+}
