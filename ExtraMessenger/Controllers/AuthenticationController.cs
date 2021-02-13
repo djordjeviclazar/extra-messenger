@@ -10,6 +10,7 @@ using ExtraMessenger.Services.Authentication.Interfaces;
 using ExtraMessenger.DTOs;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using ExtraMessenger.Models;
 
 namespace ExtraMessenger.Controllers
 {
@@ -35,14 +36,18 @@ namespace ExtraMessenger.Controllers
             string jwt = null;
             try
             {
-                result = await _authenticationService.Login(userLoginInfo.Username, userLoginInfo.Password);
-                if (result)
+                var user = await _authenticationService.Login(userLoginInfo.Username, userLoginInfo.Password);
+                if (user != null)
                 {
+                    result = true;
                     message = "Successfully logged in.";
-                    jwt = GenerateToken(userLoginInfo);
+                    jwt = GenerateToken(user);
                 }
                 else
+                {
+                    result = false;
                     message = "Invalid username/password combination.";
+                }
             }
             catch (Exception e)
             {
@@ -55,14 +60,14 @@ namespace ExtraMessenger.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterLoginDTO userRegisterInfo)
         {
-            var result = await _authenticationService.Register(userRegisterInfo.Username, userRegisterInfo.Password);
-            if (!result)
+            var user = await _authenticationService.Register(userRegisterInfo.Username, userRegisterInfo.Password);
+            if (user == null)
                 return BadRequest(new { Status = true, Message = $"User '{userRegisterInfo.Username}' already exists." });
 
-            return Ok(new { Status = true, Token = GenerateToken(userRegisterInfo) });
+            return Ok(new { Status = true, Token = GenerateToken(user) });
         }
 
-        private string GenerateToken(UserRegisterLoginDTO authenticatedUser)
+        private string GenerateToken(User authenticatedUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Secret").Value);
@@ -71,6 +76,7 @@ namespace ExtraMessenger.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, authenticatedUser.Username),
+                    new Claim(ClaimTypes.NameIdentifier, authenticatedUser.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)

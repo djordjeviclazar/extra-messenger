@@ -19,7 +19,7 @@ namespace ExtraMessenger.Services.Authentication
             _mongoService = mongoService;
         }
 
-        public async Task<bool> Login(string username, string password)
+        public async Task<User> Login(string username, string password)
         {
             var db = _mongoService.GetDb;
             var userCollection = db.GetCollection<User>("Users");
@@ -29,12 +29,12 @@ namespace ExtraMessenger.Services.Authentication
             var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
 
             if (user == null)
-                return false;
+                return null;
 
             if (!ValidatePassword(user, password))
-                return false;
+                return null;
 
-            return true;
+            return user;
         }
 
         private bool ValidatePassword(User user, string password)
@@ -54,7 +54,7 @@ namespace ExtraMessenger.Services.Authentication
             }
         }
 
-        public async Task<bool> Register(string username, string password)
+        public async Task<User> Register(string username, string password)
         {
             var db = _mongoService.GetDb;
             var userCollection = db.GetCollection<User>("Users");
@@ -64,7 +64,7 @@ namespace ExtraMessenger.Services.Authentication
             var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
 
             if (user != null)
-                return false;
+                return null;
 
             GeneratePassword(password, out byte[] passwordHash, out byte[] passwordSalt);
 
@@ -72,12 +72,13 @@ namespace ExtraMessenger.Services.Authentication
             {
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                Username = username
+                Username = username,
+                Id = ObjectId.GenerateNewId()
             };
 
             await userCollection.InsertOneAsync(registeredUser);
 
-            return true;
+            return registeredUser;
         }
 
         private void GeneratePassword(string password, out byte[] passwordHash, out byte[] passwordSalt)
