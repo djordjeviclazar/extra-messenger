@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using ExtraMessenger.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,8 @@ using ExtraMessenger.Hubs;
 using System.Threading.Tasks;
 using ExtraMessenger.Services.Authentication.Interfaces;
 using ExtraMessenger.Services.Authentication;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace ExtraMessenger
 {
@@ -38,6 +41,16 @@ namespace ExtraMessenger
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddAuthentication(options =>
             {
+                configuration.RootPath = "ClientApp/dist";
+            });
+
+            //MongoDB:
+            services.Configure<MongoDBSettings>(Configuration.GetSection("MongoDBSettings"));
+
+            services.AddSingleton<IMongoDBSettings>(sp => sp.GetRequiredService<IOptions<MongoDBSettings>>().Value);
+
+            services.AddSingleton<MongoService>();
+
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
