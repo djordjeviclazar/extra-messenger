@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { MessageService } from 'src/app/services/message.service';
+import { MessageService } from 'src/app/_services/message.service';
 
 @Component({
   selector: 'app-message-segment',

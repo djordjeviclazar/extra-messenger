@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MessageService } from './services/message.service';
+import { MessageService } from './_services/message.service';
 
 @Component({
   selector: 'app-root',
