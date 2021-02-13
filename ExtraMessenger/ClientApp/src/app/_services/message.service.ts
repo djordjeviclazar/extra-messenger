@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -36,7 +37,7 @@ export class MessageService {
       .catch(err => console.log('Error while starting connection: ', err));
   }
 
-  public sendMessage = (receiverId: number, message: any) => {
+  public sendMessage = (receiverId: string, message: any) => {
     if (receiverId == null) { return; }
     let msgObject = { message: message };
 
@@ -70,15 +71,19 @@ export class MessageService {
     this._hubConnection.stop();
   }
 
-  constructor(private _http: HttpClient) { }
+  constructor(
+    private _http: HttpClient,
+    private _authService: AuthService
+  ) {
+  }
 
-  setReceiveMessageHandler(receiveMessageHandler: any, userId: number) {
+  setReceiveMessageHandler(receiveMessageHandler: any, userId: string) {
     let newReceiver = { id: userId, handler: receiveMessageHandler };
     this._receivers.push(newReceiver);
   }
 
   getContacts(): import("rxjs").Observable <any[]> { //import("../_models/chatInteraction").
-    return this._http.get<any[]>('http://localhost:5000/' + 'message/contacts');
+    return this._http.get<any[]>('http://localhost:5000/' + 'message/contacts/' + this._authService._decodedToken.unique_name); // get by username
   }
 
   getMessages(): Observable<any[]> {
@@ -87,7 +92,7 @@ export class MessageService {
       this.messageThread.value.chatInteractionId == undefined)
       return;
 
-    return this._http.get<any[]>('http://localhost:5000/' + 'message/' + this.messageThread.value.chatInteractionId);
+    return this._http.get<any[]>('http://localhost:5000/' + 'message/messages/' + this.messageThread.value.chatInteractionId);
   }
 
 }
