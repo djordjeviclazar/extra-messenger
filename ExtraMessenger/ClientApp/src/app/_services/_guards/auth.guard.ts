@@ -15,13 +15,9 @@ export class AuthGuard implements CanActivate {
   ) { }
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    if (this._authService.loggedIn() && !route.data.forLoggedIn) {
-      this._router.navigate(["/promotions"]);
-      return false;
-    }
-
-    if (!this._authService.loggedIn() && route.data.forLoggedIn) {
+    if (!this._authService.loggedIn()) {
       this._router.navigate(["/"]);
+      this._alertifyService.warning("Please login to access the chat.");
       return false;
     }
 
