@@ -20,6 +20,6 @@ namespace ExtraMessenger.Data
             _database = _client.GetDatabase(settings.DatabaseName);
         }
 
-
+        public IMongoDatabase GetDb { get { return _database; } }
     }
 }

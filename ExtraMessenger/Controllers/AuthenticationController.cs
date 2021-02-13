@@ -55,6 +55,9 @@ namespace ExtraMessenger.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterLoginDTO userRegisterInfo)
         {
+            var result = await _authenticationService.Register(userRegisterInfo.Username, userRegisterInfo.Password);
+            if (!result)
+                return BadRequest(new { Status = false, Message = $"User {userRegisterInfo.Username} already exists." });
             return Ok(new { Status = true });
         }
 

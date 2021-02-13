@@ -49,7 +49,7 @@ export class RegisterComponent implements OnInit {
       tap((response: any) => {
         const loginResponse = Object.assign({}, response);
         if (!loginResponse.status) {
-          this._alertifyService.error(loginResponse.message ?? "Invalid username/password combination.");
+          this._alertifyService.error(loginResponse.message ?? "Registration failed.");
         } else {
           this._alertifyService.success(loginResponse.message ?? "Registration successful. Logging in...");
           this.dialogRef.close();

@@ -2,31 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ExtraMessenger.Data;
 using ExtraMessenger.Models;
 using ExtraMessenger.Services.Authentication.Interfaces;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace ExtraMessenger.Services.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
+        private readonly MongoService _mongoService;
 
-        public AuthenticationService()
+        public AuthenticationService(MongoService mongoService)
         {
+            _mongoService = mongoService;
         }
 
         public async Task<bool> Login(string username, string password)
         {
-            //using (var session = _cassandraDbConnectionProvider.Connect())
-            //{
-            //    string cql = "SELECT * FROM users WHERE username = ?";
-            //    var user = await _cassandraQueryProvider.QuerySingleOrDefault<User>(session, cql, username);
+            var db = _mongoService.GetDb;
+            var userCollection = db.GetCollection<User>("Users");
 
-            //    if (user == null)
-            //        return false;
+            var filter = Builders<User>.Filter.Eq("username", username);
 
-            //    if (!ValidatePassword(user, password))
-            //        return false;
-            //}
+            var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
+
+            if (user == null)
+                return false;
+
+            if (!ValidatePassword(user, password))
+                return false;
 
             return true;
         }
@@ -50,16 +56,26 @@ namespace ExtraMessenger.Services.Authentication
 
         public async Task<bool> Register(string username, string password)
         {
+            var db = _mongoService.GetDb;
+            var userCollection = db.GetCollection<User>("Users");
+
+            var filter = Builders<User>.Filter.Eq("username", username);
+
+            var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
+
+            if (user != null)
+                return false;
+
             GeneratePassword(password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            //using (var session = _cassandraDbConnectionProvider.Connect())
-            //{
-            //    string cql = "INSERT INTO users (username, passwordhash, passwordsalt) VALUES (?, ?, ?)";
-            //    var newUser = await _cassandraQueryProvider.ExecuteAsync(session, cql, username, passwordHash, passwordSalt);
+            User registeredUser = new User
+            {
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                Username = username
+            };
 
-            //    if (newUser == null)
-            //        return false;
-            //}
+            await userCollection.InsertOneAsync(registeredUser);
 
             return true;
         }
