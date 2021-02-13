@@ -27,7 +27,7 @@ export class MessageService {
 
   public startConnection = () => {
     this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(this._baseUrl + 'chat', { accessTokenFactory: () => localStorage.getItem('superTouristToken') })
+      .withUrl(this._baseUrl + 'chat', { accessTokenFactory: () => localStorage.getItem('authToken') })
       .build();
 
     this._hubConnection
