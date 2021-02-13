@@ -16,13 +16,14 @@ import { AuthService } from '../_services/auth.service';
 export class RegisterComponent implements OnInit {
 
   registerForm: FormGroup;
+  _jwtHelper = new JwtHelperService();
 
   constructor(
     private _formBuilder: FormBuilder,
     private _authService: AuthService,
     private _alertifyService: AlertifyService,
     private _router: Router,
-    private _jwtHelper: JwtHelperService,
+    
     public dialogRef: MatDialogRef<RegisterComponent>
   ) {
   }
