@@ -16,12 +16,15 @@ namespace ExtraMessenger.DTOs
 
         public string Name { get; set; }
 
+        public string OtherUserId { get; set; }
+
         public ContactsReturnDTO(Contact contact)
         {
             Id = contact.Id.ToString();
             ChatInteractionReference = contact.ChatInteractionReference.ToString();
             Status = contact.Status;
             Name = contact.Name;
+            OtherUserId = contact.OtherUserId.ToString();
         }
     }
 }

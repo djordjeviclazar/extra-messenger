@@ -69,7 +69,8 @@ namespace ExtraMessenger.Hubs
                     ChatInteractionReference = newChatInteraction.Id,
                     Id = ObjectId.GenerateNewId(),
                     Name = senderName,
-                    Status = "Request"
+                    Status = "Request",
+                    OtherUserId = senderId
                 };
 
                 UpdateDefinition<User> updateDefinition;
@@ -85,7 +86,8 @@ namespace ExtraMessenger.Hubs
                     ChatInteractionReference = newChatInteraction.Id,
                     Id = ObjectId.GenerateNewId(),
                     Name = receiverUser.Username,
-                    Status = "Friend"
+                    Status = "Friend",
+                    OtherUserId = receiver
                 };
 
                 if (senderUser.Contacts == null)
