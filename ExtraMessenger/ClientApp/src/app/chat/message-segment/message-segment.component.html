@@ -10,9 +10,9 @@
         </div>
         <div style="overflow: scroll; overflow-x: hidden; max-height: 630px;" class="d-flex flex-column-reverse">
             <div *ngFor="let message of messages" class="m-3">
-                <ng-template [ngIf]="message.senderUsername === _messageService.messageThread.value.senderName"
+                <ng-template [ngIf]="message.sender === _authService._decodedToken.unique_name"
                     [ngIfElse]="sentBlock">
-                    <div class="row d-flex justify-content-start p-2">
+                    <div class="row d-flex justify-content-end p-2">
                         <div class="text-white shadow-sm bg-primary rounded p-1"
                             style="display: inline-block; max-width: 400px; overflow-wrap: break-word;">
                             {{message.content}}
@@ -20,8 +20,8 @@
                     </div>
                 </ng-template>
                 <ng-template #sentBlock>
-                    <div class="row d-flex justify-content-end p-2">
-                        <div class="text-white shadow-sm bg-success rounded p-1"
+                    <div class="row d-flex justify-content-start p-2">
+                        <div class="text-white shadow-sm bg-warning rounded p-1"
                             style="display: inline-block; max-width: 400px; overflow-wrap: break-word;">
                             {{message.content}}
                         </div>

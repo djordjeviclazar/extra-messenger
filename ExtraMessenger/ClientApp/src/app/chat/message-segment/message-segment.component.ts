@@ -19,21 +19,23 @@ export class MessageSegmentComponent implements OnInit {
   messageToSend: string;
 
   constructor(
-    private _authService: AuthService,
+    public _authService: AuthService,
     public _messageService: MessageService
   ) { } //, private _authService: AuthService
 
   ngOnInit(): void {
     this.messages$ = this.messagesSubject.asObservable();
-    this.socketSubscription = this._messageService.messageArrived.asObservable()
-      .pipe(
-        filter(data =>
-          data.senderId == this._messageService.messageThread.value.recieverId
-          || this._authService._decodedToken.nameid == data.senderId) 
-      ).subscribe(
+    this.socketSubscription = this._messageService.messageArrived.asObservable() 
+      .subscribe(
         data => {
-          this.messages.unshift(data.message);
-          this.messagesSubject.next(this.messages)
+          if (data) {
+            if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
+              this.messages.unshift(data.message);
+              this.messagesSubject.next(this.messages)
+            } else {
+              // notification
+            }
+          }
         }
       )
 

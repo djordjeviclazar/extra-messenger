@@ -130,7 +130,8 @@ namespace ExtraMessenger.Hubs
                 {
                     SenderId = senderId.ToString(),
                     Message = new MessageReturnDTO(newMessage),
-                    ReceiverId = receiver.ToString()
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
                 });
             }
 
@@ -142,7 +143,8 @@ namespace ExtraMessenger.Hubs
                 {
                     SenderId = senderId.ToString(),
                     Message = new MessageReturnDTO(newMessage),
-                    ReceiverId = receiver.ToString()
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
                 });
             }
 
@@ -213,7 +215,8 @@ namespace ExtraMessenger.Hubs
                 {
                     SenderId = senderId.ToString(),
                     Message = new MessageReturnDTO(newMessage),
-                    ReceiverId = receiver.ToString()
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
                 });
             }
 
@@ -242,15 +245,6 @@ namespace ExtraMessenger.Hubs
 
             var data = _context.GetDb;
 
-
-            Message newMessage = new Message
-            {
-                Id = ObjectId.GenerateNewId(),
-                Content = message.Message,
-                Seen = false,
-                DateSent = DateTime.Now,
-                Sender = senderName
-            };
             var chatCollection = data.GetCollection<ChatInteraction>("ChatInteractions");
             var userCollection = data.GetCollection<User>("Users");
 
@@ -299,8 +293,6 @@ namespace ExtraMessenger.Hubs
                 {
                     SenderId = senderId.ToString(),
                     Message = new MessageReturnDTO(newMessage),
-                    ReceiverId = receiver.ToString()
-                });
             }
 
             var senderConnections = _connections.GetConnections(senderId);
@@ -311,7 +303,8 @@ namespace ExtraMessenger.Hubs
                 {
                     SenderId = senderId.ToString(),
                     Message = new MessageReturnDTO(newMessage),
-                    ReceiverId = receiver.ToString()
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
                 });
             }
         }

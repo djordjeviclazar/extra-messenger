@@ -11,7 +11,6 @@ export class RouterComponent implements OnInit, OnDestroy {
   constructor(private _messageService: MessageService) { }
 
   ngOnInit(): void {
-    debugger;
     this._messageService.startConnection();
     this._messageService.addRecievedMessageListener();
   }
