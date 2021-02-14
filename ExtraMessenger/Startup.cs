@@ -80,6 +80,9 @@ namespace ExtraMessenger
             services.AddSingleton<MongoService>();
 
             services.AddSignalR();
+
+            // test:
+            services.AddSingleton<ChatHub>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
