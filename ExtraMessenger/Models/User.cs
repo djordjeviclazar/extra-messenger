@@ -15,5 +15,7 @@ namespace ExtraMessenger.Models
         public byte[] PasswordHash { get; set; }
 
         public byte[] PasswordSalt { get; set; }
+
+        public List<Contact> Contacts { get; set; }
     }
 }
