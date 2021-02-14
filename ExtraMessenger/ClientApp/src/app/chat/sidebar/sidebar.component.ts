@@ -11,6 +11,7 @@ import { MessageService } from 'src/app/_services/message.service';
 export class SidebarComponent implements OnInit {
 
   contacts$: Observable<any[]>;
+  clickedContact = null;
 
   constructor(private _messageService: MessageService) { }
   ngOnInit(): void {
@@ -24,6 +25,7 @@ export class SidebarComponent implements OnInit {
   }
 
   openThread(chatInteractionId, receiverId) {
+    this.clickedContact = chatInteractionId;
     this._messageService.messageThread.next({ chatInteractionId: chatInteractionId, recieverId: receiverId });
   }
 

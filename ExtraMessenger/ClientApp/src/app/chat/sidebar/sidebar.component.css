@@ -1,14 +1,28 @@
 .chatUser-image {
-    border-radius: 50%;
-    width: 65px;
-    height: 65px;
+  border-radius: 50%;
+  width: 65px;
+  height: 65px;
 }
 
 .contact:hover {
-    background-color: rgba(2,117,216,0.2);
-    cursor: pointer;
+  background-color: rgba(2,117,216,0.2);
+  cursor: pointer;
 }
 
 .text-orange {
-  color: #ff8127;
+  color: #ff7d27;
+}
+
+.text-purple {
+  color: rgb(156, 39, 176);
+}
+
+.selected-contact {
+  background-color: rgb(0, 255, 144);
+  cursor: pointer;
+}
+
+.selected-contact:hover {
+  background-color: rgba(0, 255, 144, 0.2);
+  cursor: pointer;
 }
