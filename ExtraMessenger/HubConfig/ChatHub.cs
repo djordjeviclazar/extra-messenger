@@ -34,7 +34,10 @@ namespace ExtraMessenger.Hubs
             string senderName = Context.User.FindFirst(ClaimTypes.Name).Value;
             ObjectId senderId = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             ObjectId receiver = ObjectId.Parse(receiverId);
-            ObjectId.TryParse(message.ChatInteractionId, out ObjectId chatInteractionId);
+
+            ObjectId? chatInteractionId = null;
+            if (message.ChatInteractionId != null)
+                chatInteractionId = ObjectId.Parse(message.ChatInteractionId);
 
             var data = _context.GetDb;
 
@@ -108,14 +111,26 @@ namespace ExtraMessenger.Hubs
 
             foreach (var connectionId in userConnections)
             {
-                await Clients.Client(connectionId).SendAsync("receivedMessage", new { SenderId = senderId.ToString(), Message = message.Message }) ;
+                await Clients.Client(connectionId).SendAsync("receivedMessage", new 
+                { 
+                    SenderId = senderId.ToString(), 
+                    Message = new MessageReturnDTO(newMessage), 
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
+                });
             }
 
             var senderConnections = _connections.GetConnections(senderId);
 
             foreach (var connectionId in senderConnections)
             {
-                await Clients.Client(connectionId).SendAsync("receivedMessage", new { SenderId = senderId.ToString(), Message = message.Message });
+                await Clients.Client(connectionId).SendAsync("receivedMessage", new
+                {
+                    SenderId = senderId.ToString(),
+                    Message = new MessageReturnDTO(newMessage),
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
+                });
             }
 
         }

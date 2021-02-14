@@ -13,15 +13,18 @@ export class SidebarComponent implements OnInit {
   contacts$: Observable<any[]>;
 
   constructor(private _messageService: MessageService) { }
-
   ngOnInit(): void {
-    this.contacts$ = this._messageService.getContacts();/*.pipe(
-          tap(res => console.log(res))
-      );*/
+    this.contacts$ = this._messageService.getContacts().pipe(
+      tap(contacts => {
+        if (contacts?.length > 0)
+          this.openThread(contacts[0].chatInteractionReference, contacts[0].otherUserId);
+      }
+      )
+    );
   }
 
-  openThread(chatInteractionId, receiverName) {
-    this._messageService.messageThread.next({chatInteractionId: chatInteractionId, recieverId: receiverName});
+  openThread(chatInteractionId, receiverId) {
+    this._messageService.messageThread.next({ chatInteractionId: chatInteractionId, recieverId: receiverId });
   }
 
 }

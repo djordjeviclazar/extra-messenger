@@ -18,15 +18,7 @@ export class MessageService {
     recieverId: "-2",
     chatInteractionId: "-2"
   });
-  messageArrived = new BehaviorSubject<any>({
-    text: '',
-    timeSent: new Date(),
-    senderUsername: '',
-    receiverUsername: '',
-    seen: true,
-    senderId: "-1",
-    recieverId: "-1"
-  });
+  messageArrived = new BehaviorSubject<any>(null);
 
   public startConnection = () => {
     this._hubConnection = new signalR.HubConnectionBuilder()
@@ -50,22 +42,19 @@ export class MessageService {
     this._hubConnection.send("sendMessage", receiverId, msgObject)
       .then()
       .catch();
-    this.messageArrived.next({
-      text: message,
-      timeSent: new Date(),
-    //   senderUsername: this._authService._decodedToken.unique_name,
-      receiverUsername: '',
-      seen: true,
-    //   senderId: this._authService._decodedToken.nameid,
-      recieverId: receiverId
-    })
+    //this.messageArrived.next({
+    //  content: message,
+    //  timeSent: new Date(),
+    //  sender: '',
+    //  seen: true,
+    //  recieverId: receiverId
+    //})
   }
 
   public addRecievedMessageListener = () => {
-    this._hubConnection.on('receivedMessage', (message) => {
-      debugger;
-      console.log(message.message);
-      this.messageArrived.next(message.message);
+    this._hubConnection.on('receivedMessage', (receivedMessageDto) => {
+      console.log(receivedMessageDto.message.content);
+      this.messageArrived.next(receivedMessageDto);
 
     })
   }
