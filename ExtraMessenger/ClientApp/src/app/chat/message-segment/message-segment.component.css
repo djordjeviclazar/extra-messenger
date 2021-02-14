@@ -6,3 +6,7 @@
 .message-input {
     border: 2px solid rgba(1, 74, 138, 0.4);
 }
+
+.bg-warning {
+  background-color: #ff7d27 !important;
+}

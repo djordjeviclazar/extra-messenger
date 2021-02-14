@@ -11,6 +11,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { EditMessageDialogComponent } from './message-segment/edit-message-dialog/edit-message-dialog.component';
+import { DeleteMessageDialogComponent } from './message-segment/delete-message-dialog/delete-message-dialog.component';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -19,7 +24,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ChatComponent,
     UsersComponent,
     RouterComponent,
-    DialogOverviewExampleDialog
+    DialogOverviewExampleDialog,
+    EditMessageDialogComponent,
+    DeleteMessageDialogComponent
   ],
   imports: [
     CommonModule,
@@ -37,7 +44,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatCardModule,
     MatButtonModule,
     MatDialogModule,
-    FormsModule
+    FormsModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatFormFieldModule,
   ]
 })
 export class ChatModule { }

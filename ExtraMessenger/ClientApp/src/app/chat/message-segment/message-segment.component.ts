@@ -3,6 +3,13 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { MessageService } from 'src/app/_services/message.service';
 import { AuthService } from '../../_services/auth.service';
+import { DeletedMessageDto } from '../../_DTOs/deletedMessageDto';
+import { EditedMessageDto } from '../../_DTOs/editedMessageDto';
+import { ReceivedMessageDto } from '../../_DTOs/receivedMessageDto';
+import { MessageReturnDto } from '../../_DTOs/messageReturnDto';
+import { MatDialog } from '@angular/material/dialog';
+import { EditMessageDialogComponent } from './edit-message-dialog/edit-message-dialog.component';
+import { DeleteMessageDialogComponent } from './delete-message-dialog/delete-message-dialog.component';
 
 @Component({
   selector: 'app-message-segment',
@@ -12,29 +19,31 @@ import { AuthService } from '../../_services/auth.service';
 export class MessageSegmentComponent implements OnInit {
 
   messages$: Observable<any[]>; //merge operator
-  messages: any[] = [];
+  messages: MessageReturnDto[] = [];
   messagesSubject = new BehaviorSubject<any[]>([]);
   threadChange$;
   socketSubscription: Subscription;
   messageToSend: string;
+  showEditDeleteMessage;
 
   constructor(
+    private _matDialog: MatDialog,
     public _authService: AuthService,
     public _messageService: MessageService
-  ) { } //, private _authService: AuthService
+  ) { } 
 
   ngOnInit(): void {
     this.messages$ = this.messagesSubject.asObservable();
-    this.socketSubscription = this._messageService.messageArrived.asObservable() 
+    this.socketSubscription = this._messageService.messageArrived.asObservable()
       .subscribe(
-        data => {
+        (data: ReceivedMessageDto) => {
           if (data) {
-            if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
-              this.messages.unshift(data.message);
-              this.messagesSubject.next(this.messages)
-            } else {
-              // notification
-            }
+            if (data.edited)
+              this.processEditedMessage(data);
+            else if (data.deleted)
+              this.processDeletedMessage(data);
+            else
+              this.processReceivedMessage(data);
           }
         }
       )
@@ -47,6 +56,36 @@ export class MessageSegmentComponent implements OnInit {
         });
 
       });
+  }
+  processReceivedMessage(data: ReceivedMessageDto) {
+    if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
+      this.messages.unshift(data.message);
+      this.messagesSubject.next(this.messages)
+    } else {
+      // notification
+    }
+  }
+
+  processDeletedMessage(data: ReceivedMessageDto) {
+    if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
+      this.messages = this.messages.filter(message => message.id !== data.message.id);
+      this.messagesSubject.next(this.messages)
+    } else {
+      // notification
+    }
+  }
+
+  processEditedMessage(data: ReceivedMessageDto) {
+    if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
+      this.messages = this.messages.map(message => {
+        if (message.id === data.message.id)
+          message.content = data.message.content;
+        return message;
+      });
+      this.messagesSubject.next(this.messages)
+    } else {
+      // notification
+    }
   }
 
   ngOnDestroy(): void {
@@ -67,5 +106,31 @@ export class MessageSegmentComponent implements OnInit {
       this.messageToSend,
       this._messageService.messageThread.value.chatInteractionId);
     this.messageToSend = '';
+  }
+
+  editMessage(message: MessageReturnDto) {
+    const dialogRef = this._matDialog.open(EditMessageDialogComponent, {
+      maxHeight: '250px',
+      width: '300px',
+      data: message
+    });
+
+    dialogRef.afterClosed().subscribe((editedMessage: MessageReturnDto) => {
+      console.log(editedMessage); // send request
+    });
+  }
+
+  deleteMessage(message: MessageReturnDto) {
+    const dialogRef = this._matDialog.open(DeleteMessageDialogComponent, {
+      maxHeight: '550px',
+      width: '450px',
+      data: message
+    });
+
+    dialogRef.afterClosed().subscribe((shouldDelete: boolean) => {
+      if (shouldDelete)
+        this._messageService.deleteMessage(message.id, this._messageService.messageThread.value.recieverId,
+          this._messageService.messageThread.value.chatInteractionId);
+    });
   }
 }

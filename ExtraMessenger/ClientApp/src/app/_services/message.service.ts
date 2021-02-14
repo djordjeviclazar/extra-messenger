@@ -5,6 +5,9 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { isNullOrUndefined } from 'util';
 import { environment } from '../../environments/environment';
+import { DeletedMessageDto } from '../_DTOs/deletedMessageDto';
+import { EditedMessageDto } from '../_DTOs/editedMessageDto';
+import { ReceivedMessageDto } from '../_DTOs/receivedMessageDto';
 import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root'
@@ -42,20 +45,29 @@ export class MessageService {
     this._hubConnection.send("sendMessage", receiverId, msgObject)
       .then()
       .catch();
-    //this.messageArrived.next({
-    //  content: message,
-    //  timeSent: new Date(),
-    //  sender: '',
-    //  seen: true,
-    //  recieverId: receiverId
-    //})
+  }
+
+  public deleteMessage = (messageId: string, receiverId: string, chatInteractionId: string) => {
+    let msgObject = { id: messageId, chatInteractionId: chatInteractionId };
+
+    this._hubConnection.send("deleteMessage", receiverId, msgObject)
+      .then()
+      .catch();
   }
 
   public addRecievedMessageListener = () => {
-    this._hubConnection.on('receivedMessage', (receivedMessageDto) => {
-      console.log(receivedMessageDto.message.content);
+    this._hubConnection.on('receivedMessage', (receivedMessageDto: ReceivedMessageDto) => {
       this.messageArrived.next(receivedMessageDto);
+    })
 
+    this._hubConnection.on('editedMessage', (editedMessageDto: ReceivedMessageDto) => {
+      editedMessageDto.edited = true;
+      this.messageArrived.next(editedMessageDto);
+    })
+
+    this._hubConnection.on('deletedMessage', (deletedMessageDto: ReceivedMessageDto) => {
+      deletedMessageDto.deleted = true;
+      this.messageArrived.next(deletedMessageDto);
     })
   }
 
