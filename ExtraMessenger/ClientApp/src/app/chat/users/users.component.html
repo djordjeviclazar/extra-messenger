@@ -1,0 +1,14 @@
+<div class="users">
+    <mat-card *ngFor="let user of (users$ | async) as users" class="example-card">
+        <mat-card-header>
+            <div mat-card-avatar style="background-image: url(assets/check.png);
+            background-size: cover;"></div>
+            <mat-card-title>{{user.username | titlecase}}</mat-card-title>
+            <mat-card-subtitle>Active User</mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image width="500px" height="200px;" [src]="user.image" alt="User Photo">
+        <mat-card-actions>
+            <button color="primary" mat-raised-button (click)="openChatModal(user.username)">CHAT</button>
+        </mat-card-actions>
+    </mat-card>
+</div>

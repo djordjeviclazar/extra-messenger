@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { MessageService } from 'src/app/services/message.service';
+import { MessageService } from 'src/app/_services/message.service';
 
 @Component({
   selector: 'app-sidebar',

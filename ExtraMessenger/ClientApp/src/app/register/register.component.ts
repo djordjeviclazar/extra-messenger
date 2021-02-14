@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { tap } from 'rxjs/operators';
 import { isNullOrUndefined } from 'util';
 import { AlertifyService } from '../_services/alertify.service';
@@ -15,12 +16,14 @@ import { AuthService } from '../_services/auth.service';
 export class RegisterComponent implements OnInit {
 
   registerForm: FormGroup;
+  _jwtHelper = new JwtHelperService();
 
   constructor(
     private _formBuilder: FormBuilder,
     private _authService: AuthService,
     private _alertifyService: AlertifyService,
     private _router: Router,
+    
     public dialogRef: MatDialogRef<RegisterComponent>
   ) {
   }
@@ -53,12 +56,17 @@ export class RegisterComponent implements OnInit {
         } else {
           this._alertifyService.success(loginResponse.message ?? "Registration successful. Logging in...");
           this.dialogRef.close();
+          localStorage.setItem('authToken', response.token);
+          this._authService._decodedToken = this._jwtHelper.decodeToken(response.token);
           this._router.navigate(["/chat"]);
           this._alertifyService.success(loginResponse.message ?? "Successfully logged in");
         }
       },
         error => {
-          this._alertifyService.error("Unknown error.");
+          if (error.error && error.error?.message !== '')
+            this._alertifyService.error(error.error.message);
+          else
+            this._alertifyService.error("Unknown error.");
           console.log(error.message);
         }
       )).subscribe();

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -10,9 +11,9 @@ export class MessageService {
   _message: string = '';
   _hubConnection: signalR.HubConnection;
   _receivers: any[] = [];
-  messageThread = new BehaviorSubject<{ recieverId: number, chatInteractionId: number, senderName: string }>({
-    recieverId: -2,
-    chatInteractionId: -2,
+  messageThread = new BehaviorSubject<{ recieverId: string, chatInteractionId: string, senderName: string }>({
+    recieverId: "-2",
+    chatInteractionId: "-2",
     senderName: ''
   });
   messageArrived = new BehaviorSubject<any>({
@@ -21,13 +22,13 @@ export class MessageService {
     senderUsername: '',
     receiverUsername: '',
     seen: true,
-    senderId: -1,
-    recieverId: -1
+    senderId: "-1",
+    recieverId: "-1"
   });
 
   public startConnection = () => {
     this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(this._baseUrl + 'chat', { accessTokenFactory: () => localStorage.getItem('superTouristToken') })
+      .withUrl(this._baseUrl + 'chat', { accessTokenFactory: () => localStorage.getItem('authToken') })
       .build();
 
     this._hubConnection
@@ -36,9 +37,9 @@ export class MessageService {
       .catch(err => console.log('Error while starting connection: ', err));
   }
 
-  public sendMessage = (receiverId: number, message: any) => {
+  public sendMessage = (receiverId: string, message: any, chatInteractionId: string = undefined) => {
     if (receiverId == null) { return; }
-    let msgObject = { message: message };
+    let msgObject = { message: message, chatInteractionId: chatInteractionId };
 
     if (this._hubConnection.state == 0) {
     //   this._translator.get('somethingWentWrong').subscribe(res => this._alertifyService.error(res));
@@ -70,15 +71,19 @@ export class MessageService {
     this._hubConnection.stop();
   }
 
-  constructor(private _http: HttpClient) { }
+  constructor(
+    private _http: HttpClient,
+    private _authService: AuthService
+  ) {
+  }
 
-  setReceiveMessageHandler(receiveMessageHandler: any, userId: number) {
+  setReceiveMessageHandler(receiveMessageHandler: any, userId: string) {
     let newReceiver = { id: userId, handler: receiveMessageHandler };
     this._receivers.push(newReceiver);
   }
 
   getContacts(): import("rxjs").Observable <any[]> { //import("../_models/chatInteraction").
-    return this._http.get<any[]>('http://localhost:5000/' + 'message/contacts');
+    return this._http.get<any[]>('http://localhost:5000/' + 'message/contacts/' + this._authService._decodedToken.unique_name); // get by username
   }
 
   getMessages(): Observable<any[]> {
@@ -87,7 +92,7 @@ export class MessageService {
       this.messageThread.value.chatInteractionId == undefined)
       return;
 
-    return this._http.get<any[]>('http://localhost:5000/' + 'message/' + this.messageThread.value.chatInteractionId);
+    return this._http.get<any[]>('http://localhost:5000/' + 'message/messages/' + this.messageThread.value.chatInteractionId);
   }
 
 }

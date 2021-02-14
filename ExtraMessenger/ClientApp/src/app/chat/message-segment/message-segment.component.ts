@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { MessageService } from 'src/app/services/message.service';
+import { MessageService } from 'src/app/_services/message.service';
 
 @Component({
   selector: 'app-message-segment',
@@ -15,6 +15,7 @@ export class MessageSegmentComponent implements OnInit {
   messagesSubject = new BehaviorSubject<any[]>([]);
   threadChange$;
   socketSubscription: Subscription;
+  messageToSend: string;
 
   constructor(public _messageService: MessageService) { } //, private _authService: AuthService
 
@@ -45,5 +46,9 @@ export class MessageSegmentComponent implements OnInit {
   ngOnDestroy(): void {
     this.threadChange$.unsubscribe();
     // this.socketSubscription.unsubscribe();
+  }
+
+  sendMessage() {
+    
   }
 }

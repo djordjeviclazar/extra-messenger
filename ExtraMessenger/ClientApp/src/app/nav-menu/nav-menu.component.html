@@ -20,22 +20,35 @@
         [ngClass]="{ show: isExpanded }"
       >
         <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item mr-2"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
+          <li class="nav-item mr-2"
+              [routerLinkActive]="['link-active']"
+              [routerLinkActiveOptions]="{ exact: true }">
             <button class="btn btn-outline-success strong" [routerLink]="['/']">Home</button>
           </li>
-          <li class="nav-item mr-2">
-            <button class="btn btn-outline-success strong" (click)="openLoginDialog()"
-              >Login</button
-            >
+          <li class="nav-item mr-2" *ngIf="!_authService.loggedIn()">
+            <button class="btn btn-outline-success strong" (click)="openLoginDialog()">
+              Login
+            </button>
           </li>
-          <li class="nav-item">
-            <button class="btn btn-outline-success strong" (click)="openRegisterDialog()"
-              >Register</button
-            >
+          <li class="nav-item" *ngIf="!_authService.loggedIn()">
+            <button class="btn btn-outline-success strong" (click)="openRegisterDialog()">
+              Register
+            </button>
+          </li>
+          <li class="nav-item mr-2" *ngIf="_authService.loggedIn()">
+            <button class="btn btn-outline-success strong" (click)="navigateChat()">
+              Chat
+            </button>
+          </li>
+          <li class="nav-item mr-2" *ngIf="_authService.loggedIn()">
+            <button class="btn btn-outline-success strong" (click)="navigateUsers()">
+              Explore Users
+            </button>
+          </li>
+          <li class="nav-item" *ngIf="_authService.loggedIn()">
+            <button class="btn btn-outline-success strong" (click)="logout()">
+              Logout
+            </button>
           </li>
         </ul>
       </div>

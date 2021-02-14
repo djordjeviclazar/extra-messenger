@@ -4,8 +4,16 @@
       <h2 class="lead-title">Chat. Experiece. Explore.</h2>
       <p class="lead">Messenger media is not a media. The key is to listen, engage, and build relationships. <span class="strong">--- David Alston</span></p>
       <p class="lead">
-        <a (click)='planJourney()' fragment="planJourney"
-           class="btn btn-lg btn-outline-warning lead-button">Become a Member</a>
+        <button (click)='register()'
+                class="btn btn-lg btn-outline-warning lead-button"
+                *ngIf="!_authService.loggedIn()">
+          Become a Member
+        </button>
+        <button (click)='openChat()'
+                class="btn btn-lg btn-outline-warning lead-button"
+                *ngIf="_authService.loggedIn()">
+          Chat Now
+        </button>
       </p>
 
     </main>

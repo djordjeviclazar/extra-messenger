@@ -3,6 +3,9 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LoginComponent} from "../login/login.component";
 import {finalize} from "rxjs/operators";
 import { RegisterComponent } from '../register/register.component';
+import { AuthService } from '../_services/auth.service';
+import { Router } from '@angular/router';
+import { AlertifyService } from '../_services/alertify.service';
 
 @Component({
   selector: 'app-nav-menu',
@@ -15,7 +18,10 @@ export class NavMenuComponent implements OnInit {
   registerDialogRef: MatDialogRef<RegisterComponent>;
 
   constructor(
-    private _matDialog: MatDialog
+    private _matDialog: MatDialog,
+    private _router: Router,
+    private _alertifyService: AlertifyService,
+    public _authService: AuthService
   ) {
   }
 
@@ -58,5 +64,19 @@ export class NavMenuComponent implements OnInit {
 
 
   ngOnInit(): void {
+  }
+
+  logout() {
+    this._router.navigate(['']);
+    this._authService.logout();
+    this._alertifyService.message("Successfully logged out");
+  }
+
+  navigateChat() {
+    this._router.navigate(['/chat']);
+  }
+
+  navigateUsers() {
+    this._router.navigate(['/chat/users']);
   }
 }
