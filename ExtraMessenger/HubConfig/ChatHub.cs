@@ -34,7 +34,10 @@ namespace ExtraMessenger.Hubs
             string senderName = Context.User.FindFirst(ClaimTypes.Name).Value;
             ObjectId senderId = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             ObjectId receiver = ObjectId.Parse(receiverId);
-            ObjectId.TryParse(message.ChatInteractionId, out ObjectId chatInteractionId);
+
+            ObjectId? chatInteractionId = null;
+            if (message.ChatInteractionId != null)
+                chatInteractionId = ObjectId.Parse(message.ChatInteractionId);
 
             var data = _context.GetDb;
 
@@ -42,18 +45,22 @@ namespace ExtraMessenger.Hubs
                                                Seen = false, DateSent = DateTime.Now, Sender = senderName };
             var chatCollection = data.GetCollection<ChatInteraction>("ChatInteractions");
             var userCollection = data.GetCollection<User>("Users");
-            
+
             var filterForSenderUser = Builders<User>.Filter.Eq("_id", senderId);
-            var senderUser = (await userCollection.FindAsync<User>(filterForSenderUser)).First();
+
             var filterForReceiverUser = Builders<User>.Filter.Eq("_id", receiver);
-            var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
+
 
             if (chatInteractionId == null)
             {
+                var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
+
                 // check receiver contacts if they contain sender
                 var chatInteractionWithSender = receiverUser.Contacts?.Where(contact => contact.Name == senderName).FirstOrDefault();
                 if (chatInteractionWithSender != null)
+                {
                     chatInteractionId = chatInteractionWithSender.ChatInteractionReference;
+                }
             }
 
             if (chatInteractionId == null)
@@ -62,6 +69,8 @@ namespace ExtraMessenger.Hubs
                 List<Message> messages = new List<Message> { newMessage };
                 ChatInteraction newChatInteraction = new ChatInteraction { Id = ObjectId.GenerateNewId(), Messages = messages };
                 await chatCollection.InsertOneAsync(newChatInteraction);
+                var senderUser = (await userCollection.FindAsync<User>(filterForSenderUser)).First();
+                var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
 
                 Contact contact;
                 // New friend request for receiver:
@@ -76,9 +85,13 @@ namespace ExtraMessenger.Hubs
 
                 UpdateDefinition<User> updateDefinition;
                 if (receiverUser.Contacts == null)
+                {
                     updateDefinition = Builders<User>.Update.Set("Contacts", new List<Contact> { contact });
+                }
                 else
+                {
                     updateDefinition = Builders<User>.Update.Push<Contact>("Contacts", contact);
+                }
                 await userCollection.UpdateOneAsync(filterForReceiverUser, updateDefinition);
 
                 // New friend contact for sender:
@@ -92,9 +105,13 @@ namespace ExtraMessenger.Hubs
                 };
 
                 if (senderUser.Contacts == null)
+                {
                     updateDefinition = Builders<User>.Update.Set("Contacts", new List<Contact> { contact });
+                }
                 else
+                {
                     updateDefinition = Builders<User>.Update.Push<Contact>("Contacts", contact);
+                }
                 await userCollection.UpdateOneAsync(filterForSenderUser, updateDefinition);
             }
             else
@@ -104,20 +121,199 @@ namespace ExtraMessenger.Hubs
                 await chatCollection.UpdateOneAsync(filter, Builders<ChatInteraction>.Update.Push<Message>("Messages", newMessage));
             }
 
+            // Notify Users about new message:
             var userConnections = _connections.GetConnections(receiver);
 
             foreach (var connectionId in userConnections)
             {
-                await Clients.Client(connectionId).SendAsync("receivedMessage", new { SenderId = senderId.ToString(), Message = message.Message }) ;
+                await Clients.Client(connectionId).SendAsync("receivedMessage", new
+                {
+                    SenderId = senderId.ToString(),
+                    Message = new MessageReturnDTO(newMessage),
+                    ReceiverId = receiver.ToString()
+                });
             }
 
             var senderConnections = _connections.GetConnections(senderId);
 
             foreach (var connectionId in senderConnections)
             {
-                await Clients.Client(connectionId).SendAsync("receivedMessage", new { SenderId = senderId.ToString(), Message = message.Message });
+                await Clients.Client(connectionId).SendAsync("receivedMessage", new
+                {
+                    SenderId = senderId.ToString(),
+                    Message = new MessageReturnDTO(newMessage),
+                    ReceiverId = receiver.ToString()
+                });
             }
 
+        }
+
+        public async Task EditMessage(string receiverId, EditMessageDTO message)
+        {
+            string senderName = Context.User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId senderId = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            ObjectId receiver = ObjectId.Parse(receiverId);
+
+            ObjectId? chatInteractionId = null;
+            if (message.ChatInteractionId != null)
+                chatInteractionId = ObjectId.Parse(message.ChatInteractionId);
+
+            var data = _context.GetDb;
+
+
+            Message newMessage = new Message { Id = ObjectId.GenerateNewId(), Content = message.Message, 
+                                               Seen = false, DateSent = DateTime.Now, Sender = senderName };
+            var chatCollection = data.GetCollection<ChatInteraction>("ChatInteractions");
+            var userCollection = data.GetCollection<User>("Users");
+
+            var filterForSenderUser = Builders<User>.Filter.Eq("_id", senderId);
+
+            var filterForReceiverUser = Builders<User>.Filter.Eq("_id", receiver);
+
+            if (chatInteractionId != null)
+            {
+                // Edit message:
+                var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
+                var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
+                var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
+
+                var update = Builders<ChatInteraction>.Update.Set(chatOrigin => chatOrigin.Messages[-1].Content, message.Message);
+                await chatCollection.UpdateOneAsync(filter, update);
+            }
+            else
+            {
+                var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
+
+                // check receiver contacts if they contain sender
+                var chatInteractionWithSender = receiverUser.Contacts?.Where(contact => contact.Name == senderName).FirstOrDefault();
+                if (chatInteractionWithSender != null)
+                {
+                    // Edit message:
+                    var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
+                    var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                    var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
+                    var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
+
+                    var update = Builders<ChatInteraction>.Update.Set(chatOrigin => chatOrigin.Messages[-1].Content, message.Message);
+                    await chatCollection.UpdateOneAsync(filter, update);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            // Notify Users about Edit:
+            var userConnections = _connections.GetConnections(receiver);
+
+            foreach (var connectionId in userConnections)
+            {
+                await Clients.Client(connectionId).SendAsync("editedMessage", new
+                {
+                    SenderId = senderId.ToString(),
+                    Message = new MessageReturnDTO(newMessage),
+                    ReceiverId = receiver.ToString()
+                });
+            }
+
+            var senderConnections = _connections.GetConnections(senderId);
+
+            foreach (var connectionId in senderConnections)
+            {
+                await Clients.Client(connectionId).SendAsync("editedMessage", new
+                {
+                    SenderId = senderId.ToString(),
+                    Message = new MessageReturnDTO(newMessage),
+                    ReceiverId = receiver.ToString()
+                });
+            }
+        }
+
+        public async Task DeleteMessage(string receiverId, EditMessageDTO message)
+        {
+            string senderName = Context.User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId senderId = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            ObjectId receiver = ObjectId.Parse(receiverId);
+
+            ObjectId? chatInteractionId = null;
+            if (message.ChatInteractionId != null)
+                chatInteractionId = ObjectId.Parse(message.ChatInteractionId);
+
+            var data = _context.GetDb;
+
+
+            Message newMessage = new Message
+            {
+                Id = ObjectId.GenerateNewId(),
+                Content = message.Message,
+                Seen = false,
+                DateSent = DateTime.Now,
+                Sender = senderName
+            };
+            var chatCollection = data.GetCollection<ChatInteraction>("ChatInteractions");
+            var userCollection = data.GetCollection<User>("Users");
+
+            var filterForSenderUser = Builders<User>.Filter.Eq("_id", senderId);
+
+            var filterForReceiverUser = Builders<User>.Filter.Eq("_id", receiver);
+
+            if (chatInteractionId != null)
+            {
+                // Delete message:
+                var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
+                var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
+                var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
+
+                await chatCollection.DeleteOneAsync(filter);
+            }
+            else
+            {
+                var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
+
+                // check receiver contacts if they contain sender
+                var chatInteractionWithSender = receiverUser.Contacts?.Where(contact => contact.Name == senderName).FirstOrDefault();
+                if (chatInteractionWithSender != null)
+                {
+                    // Delete message:
+                    var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
+                    var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                    var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
+                    var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
+
+                    await chatCollection.DeleteOneAsync(filter);
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            // Notify Users about Delete:
+            var userConnections = _connections.GetConnections(receiver);
+
+            foreach (var connectionId in userConnections)
+            {
+                await Clients.Client(connectionId).SendAsync("deletedMessage", new
+                {
+                    SenderId = senderId.ToString(),
+                    Message = new MessageReturnDTO(newMessage),
+                    ReceiverId = receiver.ToString()
+                });
+            }
+
+            var senderConnections = _connections.GetConnections(senderId);
+
+            foreach (var connectionId in senderConnections)
+            {
+                await Clients.Client(connectionId).SendAsync("deletedMessage", new
+                {
+                    SenderId = senderId.ToString(),
+                    Message = new MessageReturnDTO(newMessage),
+                    ReceiverId = receiver.ToString()
+                });
+            }
         }
 
         public override async Task OnConnectedAsync()
