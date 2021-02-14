@@ -11,6 +11,6 @@ namespace ExtraMessenger.DTOs
     {
         public string Message { get; set; }
 
-        public ObjectId? ChatInteractionId { get; set; }
+        public string ChatInteractionId { get; set; }
     }
 }

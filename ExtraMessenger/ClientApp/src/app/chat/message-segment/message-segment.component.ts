@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { MessageService } from 'src/app/_services/message.service';
+import { AuthService } from '../../_services/auth.service';
 
 @Component({
   selector: 'app-message-segment',
@@ -17,18 +18,21 @@ export class MessageSegmentComponent implements OnInit {
   socketSubscription: Subscription;
   messageToSend: string;
 
-  constructor(public _messageService: MessageService) { } //, private _authService: AuthService
+  constructor(
+    private _authService: AuthService,
+    public _messageService: MessageService
+  ) { } //, private _authService: AuthService
 
   ngOnInit(): void {
     this.messages$ = this.messagesSubject.asObservable();
-
     this.socketSubscription = this._messageService.messageArrived.asObservable()
       .pipe(
-        filter(data => data.senderId == this._messageService.messageThread.value.recieverId ) //|| this._authService._decodedToken.nameid == data.senderId
+        filter(data =>
+          data.senderId == this._messageService.messageThread.value.recieverId
+          || this._authService._decodedToken.nameid == data.senderId) 
       ).subscribe(
         data => {
-          console.log(data);
-          this.messages.unshift(data);
+          this.messages.unshift(data.message);
           this.messagesSubject.next(this.messages)
         }
       )
@@ -36,7 +40,6 @@ export class MessageSegmentComponent implements OnInit {
     this.threadChange$ = this._messageService.messageThread
       .asObservable().subscribe(data => {
         this._messageService.getMessages()?.subscribe(data => {
-          console.log(data);
           this.messagesSubject.next(data)
           this.messages = data
         });
@@ -50,7 +53,6 @@ export class MessageSegmentComponent implements OnInit {
   }
 
   sendMessage() {
-    debugger;
     if (this._messageService.messageThread.value == undefined ||
       this._messageService.messageThread.value.recieverId == undefined ||
       this._messageService.messageThread.value.chatInteractionId == undefined)

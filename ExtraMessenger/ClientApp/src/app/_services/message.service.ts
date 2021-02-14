@@ -62,9 +62,10 @@ export class MessageService {
   }
 
   public addRecievedMessageListener = () => {
-    this._hubConnection.on('recievedMessage', (message) => {
-      console.log(message)
-      this.messageArrived.next(message);
+    this._hubConnection.on('receivedMessage', (message) => {
+      debugger;
+      console.log(message.message);
+      this.messageArrived.next(message.message);
 
     })
   }

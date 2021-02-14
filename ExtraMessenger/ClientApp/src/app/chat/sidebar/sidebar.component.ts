@@ -15,9 +15,9 @@ export class SidebarComponent implements OnInit {
   constructor(private _messageService: MessageService) { }
 
   ngOnInit(): void {
-    this.contacts$ = this._messageService.getContacts().pipe(
+    this.contacts$ = this._messageService.getContacts();/*.pipe(
           tap(res => console.log(res))
-      );
+      );*/
   }
 
   openThread(chatInteractionId, receiverName) {

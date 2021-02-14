@@ -34,6 +34,7 @@ namespace ExtraMessenger.Hubs
             string senderName = Context.User.FindFirst(ClaimTypes.Name).Value;
             ObjectId senderId = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             ObjectId receiver = ObjectId.Parse(receiverId);
+            ObjectId.TryParse(message.ChatInteractionId, out ObjectId chatInteractionId);
 
             var data = _context.GetDb;
 
@@ -47,15 +48,15 @@ namespace ExtraMessenger.Hubs
             var filterForReceiverUser = Builders<User>.Filter.Eq("_id", receiver);
             var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
 
-            if (message.ChatInteractionId == null)
+            if (chatInteractionId == null)
             {
                 // check receiver contacts if they contain sender
                 var chatInteractionWithSender = receiverUser.Contacts?.Where(contact => contact.Name == senderName).FirstOrDefault();
                 if (chatInteractionWithSender != null)
-                    message.ChatInteractionId = chatInteractionWithSender.ChatInteractionReference;
+                    chatInteractionId = chatInteractionWithSender.ChatInteractionReference;
             }
 
-            if (message.ChatInteractionId == null)
+            if (chatInteractionId == null)
             {
                 // New chat interaction: 
                 List<Message> messages = new List<Message> { newMessage };
@@ -99,7 +100,7 @@ namespace ExtraMessenger.Hubs
             else
             {
                 // Just add message:
-                var filter = Builders<ChatInteraction>.Filter.Eq("_id", message.ChatInteractionId);
+                var filter = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
                 await chatCollection.UpdateOneAsync(filter, Builders<ChatInteraction>.Update.Push<Message>("Messages", newMessage));
             }
 
@@ -107,7 +108,14 @@ namespace ExtraMessenger.Hubs
 
             foreach (var connectionId in userConnections)
             {
-                await Clients.Client(connectionId).SendAsync("recievedMessage", message.Message);
+                await Clients.Client(connectionId).SendAsync("receivedMessage", new { SenderId = senderId.ToString(), Message = message.Message }) ;
+            }
+
+            var senderConnections = _connections.GetConnections(senderId);
+
+            foreach (var connectionId in senderConnections)
+            {
+                await Clients.Client(connectionId).SendAsync("receivedMessage", new { SenderId = senderId.ToString(), Message = message.Message });
             }
 
         }
