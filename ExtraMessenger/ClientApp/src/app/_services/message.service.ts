@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { isNullOrUndefined } from 'util';
+import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root'
@@ -11,10 +14,9 @@ export class MessageService {
   _message: string = '';
   _hubConnection: signalR.HubConnection;
   _receivers: any[] = [];
-  messageThread = new BehaviorSubject<{ recieverId: string, chatInteractionId: string, senderName: string }>({
+  messageThread = new BehaviorSubject<{ recieverId: string, chatInteractionId: string }>({
     recieverId: "-2",
-    chatInteractionId: "-2",
-    senderName: ''
+    chatInteractionId: "-2"
   });
   messageArrived = new BehaviorSubject<any>({
     text: '',
@@ -83,7 +85,9 @@ export class MessageService {
   }
 
   getContacts(): import("rxjs").Observable <any[]> { //import("../_models/chatInteraction").
-    return this._http.get<any[]>('http://localhost:5000/' + 'message/contacts/' + this._authService._decodedToken.unique_name); // get by username
+    if (isNullOrUndefined(this._authService._decodedToken))
+      this._authService._decodedToken = new JwtHelperService().decodeToken(localStorage.getItem('authToken'));
+    return this._http.get<any[]>(environment.apiUrl + 'messenger/contacts/' + this._authService._decodedToken.unique_name); // get by username
   }
 
   getMessages(): Observable<any[]> {
@@ -92,7 +96,10 @@ export class MessageService {
       this.messageThread.value.chatInteractionId == undefined)
       return;
 
-    return this._http.get<any[]>('http://localhost:5000/' + 'message/messages/' + this.messageThread.value.chatInteractionId);
+    if (Number.parseInt(this.messageThread.value.recieverId) < 0)
+      return;
+
+    return this._http.get<any[]>(environment.apiUrl + 'messenger/messages/' + this.messageThread.value.chatInteractionId);
   }
 
 }

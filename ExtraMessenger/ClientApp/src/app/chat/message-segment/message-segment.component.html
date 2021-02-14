@@ -1,26 +1,5 @@
 <div class="message-thread shadow-sm p-3 mb-3 rounded h-100 d-flex flex-column-reverse">
     <ng-container *ngIf="(messages$ | async) as messages">
-        <div style="overflow: scroll; overflow-x: hidden; max-height: 630px;" class="d-flex flex-column-reverse">
-            <div *ngFor="let message of messages" class="m-3">
-                <ng-template [ngIf]="message.senderUsername === _messageService.messageThread.value.senderName"
-                    [ngIfElse]="sentBlock">
-                    <div class="row d-flex justify-content-start p-2">
-                        <div class="text-white shadow-sm bg-primary rounded p-1"
-                            style="display: inline-block; max-width: 400px; overflow-wrap: break-word;">
-                            {{message.text}}
-                        </div>
-                    </div>
-                </ng-template>
-                <ng-template #sentBlock>
-                    <div class="row d-flex justify-content-end p-2">
-                        <div class="text-white shadow-sm bg-success rounded p-1"
-                            style="display: inline-block; max-width: 400px; overflow-wrap: break-word;">
-                            {{message.text}}
-                        </div>
-                    </div>
-                </ng-template>
-            </div>
-        </div>
         <div class="row d-flex justify-content-center">
             <input type="text" placeholder="Enter Message ..." [(ngModel)]="messageToSend" id="messageToSend"
                 name="messageToSend" class="w-75 shadow-sm p-1 mb-2 rounded align-self-center message-input"
@@ -28,6 +7,27 @@
             <button type="button" class="shadow-sm bg-primary rounded text-light ml-1" style="height: 35px;"
                 (click)="sendMessage()">
                 <i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
+        </div>
+        <div style="overflow: scroll; overflow-x: hidden; max-height: 630px;" class="d-flex flex-column-reverse">
+            <div *ngFor="let message of messages" class="m-3">
+                <ng-template [ngIf]="message.senderUsername === _messageService.messageThread.value.senderName"
+                    [ngIfElse]="sentBlock">
+                    <div class="row d-flex justify-content-start p-2">
+                        <div class="text-white shadow-sm bg-primary rounded p-1"
+                            style="display: inline-block; max-width: 400px; overflow-wrap: break-word;">
+                            {{message.content}}
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template #sentBlock>
+                    <div class="row d-flex justify-content-end p-2">
+                        <div class="text-white shadow-sm bg-success rounded p-1"
+                            style="display: inline-block; max-width: 400px; overflow-wrap: break-word;">
+                            {{message.content}}
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
         </div>
     </ng-container>
 </div>

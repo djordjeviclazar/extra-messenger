@@ -5,7 +5,7 @@ import { MessageService } from './_services/message.service';
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit {
   title = 'app';
 
   constructor(
@@ -15,12 +15,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this._messageService.startConnection();
-    this._messageService.addRecievedMessageListener();
-  }
 
-  ngOnDestroy(): void {
-    this._messageService.disconnect();
   }
 
 }

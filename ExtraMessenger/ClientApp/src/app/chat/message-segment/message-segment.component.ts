@@ -20,7 +20,6 @@ export class MessageSegmentComponent implements OnInit {
   constructor(public _messageService: MessageService) { } //, private _authService: AuthService
 
   ngOnInit(): void {
-
     this.messages$ = this.messagesSubject.asObservable();
 
     this.socketSubscription = this._messageService.messageArrived.asObservable()
@@ -28,6 +27,7 @@ export class MessageSegmentComponent implements OnInit {
         filter(data => data.senderId == this._messageService.messageThread.value.recieverId ) //|| this._authService._decodedToken.nameid == data.senderId
       ).subscribe(
         data => {
+          console.log(data);
           this.messages.unshift(data);
           this.messagesSubject.next(this.messages)
         }
@@ -35,7 +35,8 @@ export class MessageSegmentComponent implements OnInit {
 
     this.threadChange$ = this._messageService.messageThread
       .asObservable().subscribe(data => {
-        this._messageService.getMessages().subscribe(data => {
+        this._messageService.getMessages()?.subscribe(data => {
+          console.log(data);
           this.messagesSubject.next(data)
           this.messages = data
         });
@@ -49,6 +50,18 @@ export class MessageSegmentComponent implements OnInit {
   }
 
   sendMessage() {
-    
+    debugger;
+    if (this._messageService.messageThread.value == undefined ||
+      this._messageService.messageThread.value.recieverId == undefined ||
+      this._messageService.messageThread.value.chatInteractionId == undefined)
+      return;
+
+    if (this.messageToSend === '')
+      return;
+
+    this._messageService.sendMessage(this._messageService.messageThread.value.recieverId,
+      this.messageToSend,
+      this._messageService.messageThread.value.chatInteractionId);
+    this.messageToSend = '';
   }
 }

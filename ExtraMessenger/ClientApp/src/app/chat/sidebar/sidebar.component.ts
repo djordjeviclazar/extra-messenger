@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { MessageService } from 'src/app/_services/message.service';
 
 @Component({
@@ -14,11 +15,13 @@ export class SidebarComponent implements OnInit {
   constructor(private _messageService: MessageService) { }
 
   ngOnInit(): void {
-    this.contacts$ = this._messageService.getContacts();
+    this.contacts$ = this._messageService.getContacts().pipe(
+          tap(res => console.log(res))
+      );
   }
 
-  openThread(chatInteractionId, recieverId, senderName) {
-    this._messageService.messageThread.next({chatInteractionId: chatInteractionId, recieverId: recieverId, senderName: senderName});
+  openThread(chatInteractionId, receiverName) {
+    this._messageService.messageThread.next({chatInteractionId: chatInteractionId, recieverId: receiverName});
   }
 
 }
