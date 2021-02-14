@@ -46,13 +46,33 @@ namespace ExtraMessenger.Controllers
 
             var data = _context.GetDb;
 
-            var message = (await data.GetCollection<ChatInteraction>("ChatInteractions").Aggregate()
+            return NotFound();
+
+            /*var message = (await data.GetCollection<ChatInteraction>("ChatInteractions").Aggregate()
                                                                                .Match(Ci => Ci.Id == id)
-                                                                               .Unwind<ChatInteraction, Message>(x => x.Messages)
+                                                                               .Unwind<ChatInteraction, ChatInteraction> (x => x.Messages)
                                                                                .Sort("{DateSent: -1}")
-                                                                               .Skip(page * row)
-                                                                               .Limit(row).ToListAsync());
-            return new JsonResult(message.Select(m => new MessageReturnDTO(m)));
+                                                                               //.Skip(page * row)
+                                                                               //.Limit(row)
+                                                                               .ToListAsync()
+                                                                               );*/
+
+            //return new JsonResult(message.Select(m => new MessageReturnDTO(m)));
+        }
+
+        [HttpGet("messages/{chatInteractionId}")]
+        public async Task<IActionResult> GetMessages(string chatInteractionId)
+        {
+            string real = User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId id = new ObjectId(chatInteractionId);
+
+            var data = _context.GetDb;
+
+            var filter = Builders<ChatInteraction>.Filter.Eq("_id", id);
+            var chatInteraction = await (await data.GetCollection<ChatInteraction>("ChatInteractions").FindAsync(filter)).FirstOrDefaultAsync();
+            chatInteraction.Messages.Sort((x, y) => DateTime.Compare(y.DateSent, x.DateSent));
+
+            return new JsonResult(chatInteraction.Messages.Select(m => new MessageReturnDTO(m)));
         }
         /*ovo ne ovde
         [HttpPost("send/")]
