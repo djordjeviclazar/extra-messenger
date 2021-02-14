@@ -24,10 +24,10 @@ export class UsersComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  openChatModal(username) {
+  openChatModal(objectId) {
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
       width: '250px',
-      data: {username: username}
+      data: {objectId: objectId}
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -54,7 +54,7 @@ export class DialogOverviewExampleDialog {
 
   sendMessage() {
     // this.http.post('', {message: this.message, chatInteractionId: null})
-    this.messageService.sendMessage(this.data.username, this.message)
+    this.messageService.sendMessage(this.data.objectId, this.message)
     this.dialogRef.close();
   }
 }
