@@ -37,9 +37,9 @@ namespace ExtraMessenger.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            ObjectId user = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            //ObjectId user = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            _connections.Add(user, Context.ConnectionId);
+            //_connections.Add(user, Context.ConnectionId);
 
             await base.OnConnectedAsync();
         }

@@ -20,8 +20,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { LoginComponent } from "./login/login.component";
 import { RegisterComponent } from './register/register.component';
 import { AuthGuard } from './_services/_guards/auth.guard';
-import { MatDividerModule } from '@angular/material/divider'; 
-
+import { MatDividerModule } from '@angular/material/divider';
+import { JwtModule } from '@auth0/angular-jwt';
 
 @NgModule({
   declarations: [
@@ -36,6 +36,15 @@ import { MatDividerModule } from '@angular/material/divider';
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
+    JwtModule.forRoot({
+      config: {
+         tokenGetter: function tokenGetter() {
+            return localStorage.getItem('authToken');
+         },
+         allowedDomains:['localhost:5000', 'localhost:5001'],
+         disallowedRoutes: ['localhost:5000/authentication', 'localhost:5001/authentication']
+      }
+   }),
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       {

@@ -37,9 +37,9 @@ export class MessageService {
       .catch(err => console.log('Error while starting connection: ', err));
   }
 
-  public sendMessage = (receiverId: string, message: any) => {
+  public sendMessage = (receiverId: string, message: any, chatInteractionId: string = undefined) => {
     if (receiverId == null) { return; }
-    let msgObject = { message: message };
+    let msgObject = { message: message, chatInteractionId: chatInteractionId };
 
     if (this._hubConnection.state == 0) {
     //   this._translator.get('somethingWentWrong').subscribe(res => this._alertifyService.error(res));
