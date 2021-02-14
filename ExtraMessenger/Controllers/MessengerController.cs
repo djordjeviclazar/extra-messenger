@@ -1,4 +1,5 @@
 ﻿using ExtraMessenger.Data;
+using ExtraMessenger.DTOs;
 using ExtraMessenger.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
@@ -34,24 +35,24 @@ namespace ExtraMessenger.Controllers
             var user = (await data.GetCollection<User>("Users").FindAsync<User>(filter)).FirstOrDefault();
             if (user == null) { return BadRequest(); }
 
-            return new JsonResult(user.Contacts);
+            return new JsonResult(user.Contacts.Select(c => new ContactsReturnDTO(c)));
         }
 
-        [HttpGet("messages/{id}/{page}/{row}")]
-        public async Task<IActionResult> GetMessages(ObjectId id, int page, int row)
+        [HttpGet("messages/{idString}/{page}/{row}")]
+        public async Task<IActionResult> GetMessages(string idString, int page, int row)
         {
             string real = User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId id = new ObjectId(idString);
 
             var data = _context.GetDb;
 
-            var message = (data.GetCollection<ChatInteraction>("ChatInteractions").Aggregate()
+            var message = (await data.GetCollection<ChatInteraction>("ChatInteractions").Aggregate()
                                                                                .Match(Ci => Ci.Id == id)
                                                                                .Unwind<ChatInteraction, Message>(x => x.Messages)
                                                                                .Sort("{DateSent: -1}")
                                                                                .Skip(page * row)
-                                                                               .Limit(row));
-
-            return new JsonResult(message);
+                                                                               .Limit(row).ToListAsync());
+            return new JsonResult(message.Select(m => new MessageReturnDTO(m)));
         }
         /*ovo ne ovde
         [HttpPost("send/")]
