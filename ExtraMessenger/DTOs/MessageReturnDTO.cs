@@ -18,6 +18,11 @@ namespace ExtraMessenger.DTOs
 
         public bool Seen { get; set; }
 
+        public MessageReturnDTO()
+        {
+
+        }
+
         public MessageReturnDTO(Message message)
         {
             Id = message.Id.ToString();

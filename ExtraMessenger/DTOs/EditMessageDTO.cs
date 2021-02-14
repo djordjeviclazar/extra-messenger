@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExtraMessenger.Hubs
+namespace ExtraMessenger.DTOs
 {
     public class EditMessageDTO
     {

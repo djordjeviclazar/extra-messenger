@@ -162,9 +162,6 @@ namespace ExtraMessenger.Hubs
 
             var data = _context.GetDb;
 
-
-            Message newMessage = new Message { Id = ObjectId.GenerateNewId(), Content = message.Message, 
-                                               Seen = false, DateSent = DateTime.Now, Sender = senderName };
             var chatCollection = data.GetCollection<ChatInteraction>("ChatInteractions");
             var userCollection = data.GetCollection<User>("Users");
 
@@ -176,7 +173,7 @@ namespace ExtraMessenger.Hubs
             {
                 // Edit message:
                 var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
-                var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                var filterMessage = Builders<Message>.Filter.Eq("_id", message.Id);
                 var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
                 var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
 
@@ -193,7 +190,7 @@ namespace ExtraMessenger.Hubs
                 {
                     // Edit message:
                     var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
-                    var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                    var filterMessage = Builders<Message>.Filter.Eq("_id", message.Id);
                     var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
                     var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
 
@@ -214,7 +211,7 @@ namespace ExtraMessenger.Hubs
                 await Clients.Client(connectionId).SendAsync("editedMessage", new
                 {
                     SenderId = senderId.ToString(),
-                    Message = new MessageReturnDTO(newMessage),
+                    Message = new MessageReturnDTO { Sender = senderName, Content = message.Message, Seen = false},
                     ReceiverId = receiver.ToString(),
                     ChatInteractionId = chatInteractionId.ToString()
                 });
@@ -227,8 +224,9 @@ namespace ExtraMessenger.Hubs
                 await Clients.Client(connectionId).SendAsync("editedMessage", new
                 {
                     SenderId = senderId.ToString(),
-                    Message = new MessageReturnDTO(newMessage),
-                    ReceiverId = receiver.ToString()
+                    Message = new MessageReturnDTO { Sender = senderName, Content = message.Message, Seen = false },
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
                 });
             }
         }
@@ -256,7 +254,7 @@ namespace ExtraMessenger.Hubs
             {
                 // Delete message:
                 var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
-                var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                var filterMessage = Builders<Message>.Filter.Eq("_id", message.Id);
                 var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
                 var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
 
@@ -272,7 +270,7 @@ namespace ExtraMessenger.Hubs
                 {
                     // Delete message:
                     var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
-                    var filterMessage = Builders<Message>.Filter.Eq("_id", newMessage.Id);
+                    var filterMessage = Builders<Message>.Filter.Eq("_id", message.Id);
                     var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
                     var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
 
@@ -292,7 +290,10 @@ namespace ExtraMessenger.Hubs
                 await Clients.Client(connectionId).SendAsync("deletedMessage", new
                 {
                     SenderId = senderId.ToString(),
-                    Message = new MessageReturnDTO(newMessage),
+                    Message = new MessageReturnDTO { Sender = senderName, Content = message.Message, Seen = false },
+                    ReceiverId = receiver.ToString(),
+                    ChatInteractionId = chatInteractionId.ToString()
+                });
             }
 
             var senderConnections = _connections.GetConnections(senderId);
@@ -302,7 +303,7 @@ namespace ExtraMessenger.Hubs
                 await Clients.Client(connectionId).SendAsync("deletedMessage", new
                 {
                     SenderId = senderId.ToString(),
-                    Message = new MessageReturnDTO(newMessage),
+                    Message = new MessageReturnDTO { Sender = senderName, Content = message.Message, Seen = false },
                     ReceiverId = receiver.ToString(),
                     ChatInteractionId = chatInteractionId.ToString()
                 });
