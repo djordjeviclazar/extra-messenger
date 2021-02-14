@@ -11,13 +11,14 @@ using ExtraMessenger.Models;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ExtraMessenger.Hubs
 {
     [Authorize]
     public class ChatHub : Hub
     {
-        private readonly static ConnectionMapping<string> _connections = new ConnectionMapping<string>();
+        private readonly static ConnectionMapping<ObjectId> _connections = new ConnectionMapping<ObjectId>();
 
         private readonly IConfiguration _config;
         private readonly MongoService _context;
@@ -28,83 +29,79 @@ namespace ExtraMessenger.Hubs
             _context = context;
         }
 
-        public async Task SendMessage(string recieverName, SendingMessageDTO message)
+        public async Task SendMessage(string receiverId, SendingMessageDTO message)
         {
-            //Laza Comes Here
-            string name = Context.User.FindFirst(ClaimTypes.Name).Value;
-            ObjectId id = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            string senderName = Context.User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId senderId = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            ObjectId receiver = ObjectId.Parse(receiverId);
 
             var data = _context.GetDb;
 
             Message newMessage = new Message { Id = ObjectId.GenerateNewId(), Content = message.Message, 
-                                               Seen = false, DateSent = DateTime.Now, Sender = name };
+                                               Seen = false, DateSent = DateTime.Now, Sender = senderName };
             var chatCollection = data.GetCollection<ChatInteraction>("ChatInteractions");
             var userCollection = data.GetCollection<User>("Users");
+            
+            var filterForSenderUser = Builders<User>.Filter.Eq("_id", senderId);
+            var senderUser = (await userCollection.FindAsync<User>(filterForSenderUser)).First();
+            var filterForReceiverUser = Builders<User>.Filter.Eq("_id", receiver);
+            var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
+
+            if (message.ChatInteractionId == null)
+            {
+                // check receiver contacts if they contain sender
+                var chatInteractionWithSender = receiverUser.Contacts?.Where(contact => contact.Name == senderName).FirstOrDefault();
+                if (chatInteractionWithSender != null)
+                    message.ChatInteractionId = chatInteractionWithSender.ChatInteractionReference;
+            }
 
             if (message.ChatInteractionId == null)
             {
                 // New chat interaction: 
-                List<Message> messages = new List<Message>();
-                messages.Add(newMessage);
-                ChatInteraction newChatInteraction = new ChatInteraction { Id = ObjectId.GenerateNewId(), Messages = messages};
+                List<Message> messages = new List<Message> { newMessage };
+                ChatInteraction newChatInteraction = new ChatInteraction { Id = ObjectId.GenerateNewId(), Messages = messages };
                 await chatCollection.InsertOneAsync(newChatInteraction);
 
                 Contact contact;
-                // New friend request for second user:
+                // New friend request for receiver:
                 contact = new Contact
                 {
                     ChatInteractionReference = newChatInteraction.Id,
                     Id = ObjectId.GenerateNewId(),
-                    Name = name,
+                    Name = senderName,
                     Status = "Request"
                 };
-                var recieverUser = (await userCollection.FindAsync($"{{\"Username\": \"{recieverName}\"}}")).FirstOrDefault();
 
                 UpdateDefinition<User> updateDefinition;
-                if (recieverUser.Contacts == null)
-                {
+                if (receiverUser.Contacts == null)
                     updateDefinition = Builders<User>.Update.Set("Contacts", new List<Contact> { contact });
-                }
                 else
-                {
-
                     updateDefinition = Builders<User>.Update.Push<Contact>("Contacts", contact);
-                    
-                }
-                await userCollection.UpdateOneAsync($"{{\"Username\": \"{recieverName}\"}}", updateDefinition);
+                await userCollection.UpdateOneAsync(filterForReceiverUser, updateDefinition);
 
-                // New friend contact for first user:
-                contact = new Contact { ChatInteractionReference = newChatInteraction.Id, Id = ObjectId.GenerateNewId(), 
-                                                Name = recieverName, Status = "Friend"};
+                // New friend contact for sender:
+                contact = new Contact
+                {
+                    ChatInteractionReference = newChatInteraction.Id,
+                    Id = ObjectId.GenerateNewId(),
+                    Name = receiverUser.Username,
+                    Status = "Friend"
+                };
 
-                var filter = Builders<User>.Filter.Eq("_id", id);
-                var senderUser = (await userCollection.FindAsync<User>(filter)).First();
-                
                 if (senderUser.Contacts == null)
-                {
                     updateDefinition = Builders<User>.Update.Set("Contacts", new List<Contact> { contact });
-                }
                 else
-                {
-
                     updateDefinition = Builders<User>.Update.Push<Contact>("Contacts", contact);
-
-                }
-                await userCollection.UpdateOneAsync(filter, updateDefinition);
-
-
+                await userCollection.UpdateOneAsync(filterForSenderUser, updateDefinition);
             }
             else
             {
                 // Just add message:
                 var filter = Builders<ChatInteraction>.Filter.Eq("_id", message.ChatInteractionId);
-                
-                var chat = (await chatCollection.FindAsync<ChatInteraction>(filter)).FirstOrDefault();
-                chat.Messages.Add(newMessage);
-                await chatCollection.UpdateOneAsync($"{{_id = {message.ChatInteractionId}}}", chat.ToBsonDocument());
+                await chatCollection.UpdateOneAsync(filter, Builders<ChatInteraction>.Update.Push<Message>("Messages", newMessage));
             }
 
-            var userConnections = _connections.GetConnections(recieverName);
+            var userConnections = _connections.GetConnections(receiver);
 
             foreach (var connectionId in userConnections)
             {
@@ -115,18 +112,18 @@ namespace ExtraMessenger.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            //string username = Context.User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId user = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            //_connections.Add(username, Context.ConnectionId);
+            _connections.Add(user, Context.ConnectionId);
 
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            //string username = Context.User.FindFirst(ClaimTypes.Name).Value;
+            ObjectId user = ObjectId.Parse(Context.User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            //_connections.Remove(username, Context.ConnectionId);
+            _connections.Remove(user, Context.ConnectionId);
 
             await base.OnDisconnectedAsync(ex);
         }
