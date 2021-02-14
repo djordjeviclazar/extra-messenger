@@ -37,7 +37,7 @@ export class MessageService {
       .catch(err => console.log('Error while starting connection: ', err));
   }
 
-  public sendMessage = (receiverId: string, message: any, chatInteractionId: string = undefined) => {
+  public sendMessage = (receiverId: string, message: any, chatInteractionId: string = null) => {
     if (receiverId == null) { return; }
     let msgObject = { message: message, chatInteractionId: chatInteractionId };
 

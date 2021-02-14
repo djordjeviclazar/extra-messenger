@@ -34,7 +34,10 @@ namespace ExtraMessenger.Controllers
 
             var userCollection = db.GetCollection<User>("Users");
 
-            var users = await userCollection.FindAsync<User>(new BsonDocument());
+            
+            // var users = await userCollection.FindAsync<User>(new BsonDocument());
+            var filter = Builders<User>.Filter.Empty;
+            var users = await userCollection.FindAsync<User>(filter);
 
             var usersList = await users.ToListAsync();
 

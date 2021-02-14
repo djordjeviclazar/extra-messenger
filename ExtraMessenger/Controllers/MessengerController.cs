@@ -30,7 +30,7 @@ namespace ExtraMessenger.Controllers
 
             var data = _context.GetDb;
 
-            var filter = Builders<User>.Filter.Eq<string>("Username", username);
+            var filter = Builders<User>.Filter.Eq("Username", username);
             var user = (await data.GetCollection<User>("Users").FindAsync<User>(filter)).FirstOrDefault();
             if (user == null) { return BadRequest(); }
 
@@ -45,7 +45,7 @@ namespace ExtraMessenger.Controllers
             var data = _context.GetDb;
 
             var message = (data.GetCollection<ChatInteraction>("ChatInteractions").Aggregate()
-                                                                               .Match<ChatInteraction>(Ci => Ci.Id == id)
+                                                                               .Match(Ci => Ci.Id == id)
                                                                                .Unwind<ChatInteraction, Message>(x => x.Messages)
                                                                                .Sort("{DateSent: -1}")
                                                                                .Skip(page * row)

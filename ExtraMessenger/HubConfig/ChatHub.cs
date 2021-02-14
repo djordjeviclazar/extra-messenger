@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace ExtraMessenger.Hubs
 {
-    // [Authorize]
+    [Authorize]
     public class ChatHub : Hub
     {
         private readonly static ConnectionMapping<string> _connections = new ConnectionMapping<string>();
@@ -49,12 +49,7 @@ namespace ExtraMessenger.Hubs
                 ChatInteraction newChatInteraction = new ChatInteraction { Id = ObjectId.GenerateNewId(), Messages = messages};
                 await chatCollection.InsertOneAsync(newChatInteraction);
 
-                // New friend contact for first user:
-                Contact contact = new Contact { ChatInteractionReference = newChatInteraction.Id, Id = ObjectId.GenerateNewId(), 
-                                                Name = recieverName, Status = "Friend"};
-
-                await userCollection.UpdateOneAsync($"{{_id = {id}}}", contact.ToBsonDocument());
-
+                Contact contact;
                 // New friend request for second user:
                 contact = new Contact
                 {
@@ -63,8 +58,41 @@ namespace ExtraMessenger.Hubs
                     Name = name,
                     Status = "Request"
                 };
+                var recieverUser = (await userCollection.FindAsync($"{{\"Username\": \"{recieverName}\"}}")).FirstOrDefault();
 
-                await userCollection.UpdateOneAsync($"{{Username = {recieverName}}}", contact.ToBsonDocument());
+                UpdateDefinition<User> updateDefinition;
+                if (recieverUser.Contacts == null)
+                {
+                    updateDefinition = Builders<User>.Update.Set("Contacts", new List<Contact> { contact });
+                }
+                else
+                {
+
+                    updateDefinition = Builders<User>.Update.Push<Contact>("Contacts", contact);
+                    
+                }
+                await userCollection.UpdateOneAsync($"{{\"Username\": \"{recieverName}\"}}", updateDefinition);
+
+                // New friend contact for first user:
+                contact = new Contact { ChatInteractionReference = newChatInteraction.Id, Id = ObjectId.GenerateNewId(), 
+                                                Name = recieverName, Status = "Friend"};
+
+                var filter = Builders<User>.Filter.Eq("_id", id);
+                var senderUser = (await userCollection.FindAsync<User>(filter)).First();
+                
+                if (senderUser.Contacts == null)
+                {
+                    updateDefinition = Builders<User>.Update.Set("Contacts", new List<Contact> { contact });
+                }
+                else
+                {
+
+                    updateDefinition = Builders<User>.Update.Push<Contact>("Contacts", contact);
+
+                }
+                await userCollection.UpdateOneAsync(filter, updateDefinition);
+
+
             }
             else
             {
@@ -87,18 +115,18 @@ namespace ExtraMessenger.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            string username = Context.User.FindFirst(ClaimTypes.Name).Value;
+            //string username = Context.User.FindFirst(ClaimTypes.Name).Value;
 
-            _connections.Add(username, Context.ConnectionId);
+            //_connections.Add(username, Context.ConnectionId);
 
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            string username = Context.User.FindFirst(ClaimTypes.Name).Value;
+            //string username = Context.User.FindFirst(ClaimTypes.Name).Value;
 
-            _connections.Remove(username, Context.ConnectionId);
+            //_connections.Remove(username, Context.ConnectionId);
 
             await base.OnDisconnectedAsync(ex);
         }
