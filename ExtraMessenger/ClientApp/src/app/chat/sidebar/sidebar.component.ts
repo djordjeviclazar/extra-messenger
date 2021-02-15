@@ -29,7 +29,11 @@ export class SidebarComponent implements OnInit {
   openThread(chatInteractionId, receiverId, contact = undefined) {
     if(contact) {
       contact.seen = true;
-      this.http.get(environment.apiUrl + 'messenger/seenall/' + receiverId).subscribe(res => console.log(res))
+      this.http.get(environment.apiUrl + 'messenger/seenall/' + receiverId, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        }
+      }).subscribe(res => console.log(res))
     }
     this.clickedContact = chatInteractionId;
     this._messageService.messageThread.next({ chatInteractionId: chatInteractionId, recieverId: receiverId });
