@@ -1,6 +1,6 @@
 <div  class="message-thread shadow-sm p-3 mb-3 rounded h-100 d-flex flex-column-reverse">
   <ng-container *ngIf="(messages$ | async) as messages">
-    <div class="row d-flex justify-content-center">
+    <div *ngIf="messages.length > 0" class="row d-flex justify-content-center">
       <input type="text" placeholder="Enter Message ..." [(ngModel)]="messageToSend" id="messageToSend"
              name="messageToSend" class="w-75 shadow-sm p-1 mb-2 rounded align-self-center message-input"
              (keyup.enter)="sendMessage()">

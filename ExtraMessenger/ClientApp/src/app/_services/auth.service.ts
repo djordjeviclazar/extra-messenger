@@ -13,7 +13,7 @@ export class AuthService {
   _jwtHelper = new JwtHelperService();
   _decodedToken: any;
 
-  constructor(private _http: HttpClient, private _alertify: AlertifyService) { }
+  constructor(private _http: HttpClient) { }
 
   login(user) {
     return this._http.post(this._baseUrl + 'authentication/login', user)

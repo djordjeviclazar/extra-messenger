@@ -35,7 +35,7 @@ namespace ExtraMessenger.Controllers
             var user = (await data.GetCollection<User>("Users").FindAsync<User>(filter)).FirstOrDefault();
             if (user == null) { return BadRequest(); }
 
-            return new JsonResult(user.Contacts.Select(c => new ContactsReturnDTO(c)));
+            return new JsonResult(user.Contacts?.Select(c => new ContactsReturnDTO(c)));
         }
 
         [HttpGet("messages/{idString}/{page}/{row}")]

@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { MessageService } from '../_services/message.service';
 
 @Component({
@@ -13,6 +14,8 @@ export class RouterComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._messageService.startConnection();
     this._messageService.addRecievedMessageListener();
+    this._messageService.messageArrived = new BehaviorSubject<any>(null);
+    this._messageService.messageThread = new BehaviorSubject<any>(null);
   }
 
   ngOnDestroy(): void {
