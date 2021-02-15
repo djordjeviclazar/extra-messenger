@@ -39,13 +39,26 @@ namespace ExtraMessenger.Controllers
             var filterContacts = Builders<User>.Filter.Eq(u => u.Id, currentUser);
             //var users = await userCollection.FindAsync<User>(filter);
             User currentDocument = (await userCollection.FindAsync<User>(filterContacts)).First<User>();
-            var contactsArray = currentDocument.Contacts.Select(x => x.OtherUserId);
+            var contactUsers = currentDocument.Contacts;
 
-            var filter = Builders<User>.Filter.And(!filterContacts & Builders<User>.Filter.Nin("_id", contactsArray));
-            var users = await userCollection.Aggregate<User>().Match(filter)
-                                                              .Limit(20)
-                                                              .ToListAsync();
-                                                              //.ToString();
+            List<User> users;
+            if (contactUsers != null)
+            {
+                var contactsArray = currentDocument.Contacts.Select(x => x.OtherUserId);
+
+                var filter = Builders<User>.Filter.And(!filterContacts & Builders<User>.Filter.Nin("_id", contactsArray));
+                users = await userCollection.Aggregate<User>().Match(filter)
+                                                                  .Limit(20)
+                                                                  .ToListAsync();
+                                                                //.ToString();
+            }
+            else
+            {
+                users = await userCollection.Aggregate<User>().Match(!filterContacts)
+                                                                  .Limit(20)
+                                                                  .ToListAsync();
+                //.ToString();
+            }
             return Ok(users.Select(x => new UserDTO { ObjectId = x.Id.ToString(), Username = x.Username }));
         }
 
