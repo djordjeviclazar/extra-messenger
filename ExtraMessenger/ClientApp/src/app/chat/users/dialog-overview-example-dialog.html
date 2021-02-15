@@ -1,5 +1,9 @@
 <div>
-    <h1>Send a message!</h1>
-    <input [(ngModel)]="message">
-    <button (click)="sendMessage()">Send</button>
+  <h1>Send a message!</h1>
+  
+  <mat-form-field color="accent">
+    <mat-label>Message</mat-label>
+    <input matInput placeholder="Enter a message" [(ngModel)]="message">
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="sendMessage()">Send</button>
 </div>
