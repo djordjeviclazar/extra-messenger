@@ -7,6 +7,7 @@ import { isNullOrUndefined } from 'util';
 import { environment } from '../../environments/environment';
 import { DeletedMessageDto } from '../_DTOs/deletedMessageDto';
 import { EditedMessageDto } from '../_DTOs/editedMessageDto';
+import { MessageReturnDto } from '../_DTOs/messageReturnDto';
 import { ReceivedMessageDto } from '../_DTOs/receivedMessageDto';
 import { AuthService } from './auth.service';
 @Injectable({
@@ -51,6 +52,18 @@ export class MessageService {
     let msgObject = { id: messageId, chatInteractionId: chatInteractionId };
 
     this._hubConnection.send("deleteMessage", receiverId, msgObject)
+      .then()
+      .catch();
+  }
+
+  public editMessage = (message: MessageReturnDto, receiverId: string, chatInteractionId: string) => {
+    const editMessageDto = {
+      id: message.id,
+      message: message.content,
+      chatInteractionId: chatInteractionId
+    };
+
+    this._hubConnection.send("editMessage", receiverId, editMessageDto)
       .then()
       .catch();
   }

@@ -116,7 +116,10 @@ export class MessageSegmentComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((editedMessage: MessageReturnDto) => {
-      console.log(editedMessage); // send request
+      if (message.content !== editedMessage.content)
+        this._messageService.editMessage(editedMessage,
+          this._messageService.messageThread.value.recieverId,
+          this._messageService.messageThread.value.chatInteractionId);
     });
   }
 
