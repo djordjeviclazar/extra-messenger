@@ -150,7 +150,7 @@ namespace ExtraMessenger.Hubs
                     var filterContactList = Builders<User>.Filter.ElemMatch(user => user.Contacts, filterContact);
                     var filter = Builders<User>.Filter.And(filterUser, filterContactList);
 
-                    var update = Builders<User>.Update.Set(userOrigin => userOrigin.Contacts[-1].Seen, true);
+                    var update = Builders<User>.Update.Set(userOrigin => userOrigin.Contacts[-1].Seen, false);
                     await userCollection.UpdateOneAsync(filter, update);
                 }
             }
