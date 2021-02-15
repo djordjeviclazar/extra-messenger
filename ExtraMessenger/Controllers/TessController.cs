@@ -60,7 +60,7 @@ namespace ExtraMessenger.Controllers
             {
                 // Edit message:
                 var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
-                var filterMessage = Builders<Message>.Filter.Eq("_id", message.Id);
+                var filterMessage = Builders<Message>.Filter.Eq("_id", ObjectId.Parse(message.Id));
                 var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
                 var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
 
@@ -77,8 +77,8 @@ namespace ExtraMessenger.Controllers
                 {
                     // Edit message:
                     var filterChat = Builders<ChatInteraction>.Filter.Eq("_id", chatInteractionId);
-                    var filterMessage = Builders<Message>.Filter.Eq("_id", message.Id);
-                    var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch("Messages", filterMessage);
+                    var filterMessage = Builders<Message>.Filter.Eq("_id", ObjectId.Parse(message.Id));
+                    var filterMessageList = Builders<ChatInteraction>.Filter.ElemMatch(chat => chat.Messages, filterMessage);
                     var filter = Builders<ChatInteraction>.Filter.And(filterChat, filterMessageList);
 
                     var update = Builders<ChatInteraction>.Update.Set(chatOrigin => chatOrigin.Messages[-1].Content, message.Message);
