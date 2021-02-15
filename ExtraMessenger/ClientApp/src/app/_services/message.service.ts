@@ -5,8 +5,6 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { isNullOrUndefined } from 'util';
 import { environment } from '../../environments/environment';
-import { DeletedMessageDto } from '../_DTOs/deletedMessageDto';
-import { EditedMessageDto } from '../_DTOs/editedMessageDto';
 import { MessageReturnDto } from '../_DTOs/messageReturnDto';
 import { ReceivedMessageDto } from '../_DTOs/receivedMessageDto';
 import { AuthService } from './auth.service';

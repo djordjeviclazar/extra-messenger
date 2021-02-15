@@ -3,8 +3,6 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { MessageService } from 'src/app/_services/message.service';
 import { AuthService } from '../../_services/auth.service';
-import { DeletedMessageDto } from '../../_DTOs/deletedMessageDto';
-import { EditedMessageDto } from '../../_DTOs/editedMessageDto';
 import { ReceivedMessageDto } from '../../_DTOs/receivedMessageDto';
 import { MessageReturnDto } from '../../_DTOs/messageReturnDto';
 import { MatDialog } from '@angular/material/dialog';
