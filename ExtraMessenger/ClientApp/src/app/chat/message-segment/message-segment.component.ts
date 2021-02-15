@@ -56,7 +56,7 @@ export class MessageSegmentComponent implements OnInit {
       });
   }
   processReceivedMessage(data: ReceivedMessageDto) {
-    if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
+    if (this._messageService.messageThread.value?.chatInteractionId === data.chatInteractionId) {
       this.messages.unshift(data.message);
       this.messagesSubject.next(this.messages)
     } else {
@@ -65,7 +65,7 @@ export class MessageSegmentComponent implements OnInit {
   }
 
   processDeletedMessage(data: ReceivedMessageDto) {
-    if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
+    if (this._messageService.messageThread.value?.chatInteractionId === data.chatInteractionId) {
       this.messages = this.messages.filter(message => message.id !== data.message.id);
       this.messagesSubject.next(this.messages)
     } else {
@@ -74,7 +74,7 @@ export class MessageSegmentComponent implements OnInit {
   }
 
   processEditedMessage(data: ReceivedMessageDto) {
-    if (this._messageService.messageThread.value.chatInteractionId === data.chatInteractionId) {
+    if (this._messageService.messageThread.value?.chatInteractionId === data.chatInteractionId) {
       this.messages = this.messages.map(message => {
         if (message.id === data.message.id)
           message.content = data.message.content;
