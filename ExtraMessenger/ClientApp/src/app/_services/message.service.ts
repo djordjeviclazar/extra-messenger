@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import * as signalR from '@aspnet/signalr';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -71,7 +72,7 @@ export class MessageService {
   public addRecievedMessageListener = () => {
     this._hubConnection.on('receivedMessage', (receivedMessageDto: ReceivedMessageDto) => {
       this.messageArrived.next(receivedMessageDto);
-      if(this.currentChatInteraction != receivedMessageDto.chatInteractionId)
+      if(this.currentChatInteraction != receivedMessageDto.chatInteractionId && this.router.url != '/chat/users')
         this.alertify.message('New Message From: ' + receivedMessageDto.message.sender)
     })
 
@@ -93,7 +94,8 @@ export class MessageService {
   constructor(
     private _http: HttpClient,
     private _authService: AuthService,
-    private alertify: AlertifyService
+    private alertify: AlertifyService,
+    private router: Router
   ) {
   }
 
