@@ -50,7 +50,7 @@ namespace ExtraMessenger.Hubs
 
             var filterForReceiverUser = Builders<User>.Filter.Eq("_id", receiver);
 
-
+            bool setSeen = true;
             if (chatInteractionId == null)
             {
                 var receiverUser = (await userCollection.FindAsync(filterForReceiverUser)).FirstOrDefault();
@@ -80,8 +80,10 @@ namespace ExtraMessenger.Hubs
                     Id = ObjectId.GenerateNewId(),
                     Name = senderName,
                     Status = "Request",
-                    OtherUserId = senderId
+                    OtherUserId = senderId,
+                    Seen = false
                 };
+                setSeen = false;
 
                 UpdateDefinition<User> updateDefinition;
                 if (receiverUser.Contacts == null)
@@ -101,7 +103,8 @@ namespace ExtraMessenger.Hubs
                     Id = ObjectId.GenerateNewId(),
                     Name = receiverUser.Username,
                     Status = "Friend",
-                    OtherUserId = receiver
+                    OtherUserId = receiver,
+                    Seen = true
                 };
 
                 if (senderUser.Contacts == null)
@@ -124,15 +127,32 @@ namespace ExtraMessenger.Hubs
             // Notify Users about new message:
             var userConnections = _connections.GetConnections(receiver);
 
-            foreach (var connectionId in userConnections)
+            if (userConnections != null)
             {
-                await Clients.Client(connectionId).SendAsync("receivedMessage", new
+                foreach (var connectionId in userConnections)
                 {
-                    SenderId = senderId.ToString(),
-                    Message = new MessageReturnDTO(newMessage),
-                    ReceiverId = receiver.ToString(),
-                    ChatInteractionId = chatInteractionId.ToString()
-                });
+                    await Clients.Client(connectionId).SendAsync("receivedMessage", new
+                    {
+                        SenderId = senderId.ToString(),
+                        Message = new MessageReturnDTO(newMessage),
+                        ReceiverId = receiver.ToString(),
+                        ChatInteractionId = chatInteractionId.ToString()
+                    });
+                }
+            }
+            else
+            {
+                // Nobody notified, set Seen to false:
+                if (setSeen)
+                {
+                    var filterUser = Builders<User>.Filter.Eq("_id", senderId);
+                    var filterContact = Builders<Contact>.Filter.Eq(u => u.OtherUserId, receiver);
+                    var filterContactList = Builders<User>.Filter.ElemMatch(user => user.Contacts, filterContact);
+                    var filter = Builders<User>.Filter.And(filterUser, filterContactList);
+
+                    var update = Builders<User>.Update.Set(userOrigin => userOrigin.Contacts[-1].Seen, true);
+                    await userCollection.UpdateOneAsync(filter, update);
+                }
             }
 
             var senderConnections = _connections.GetConnections(senderId);

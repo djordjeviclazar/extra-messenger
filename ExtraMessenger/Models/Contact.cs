@@ -15,5 +15,7 @@ namespace ExtraMessenger.Models
         public string Name { get; set; }
 
         public ObjectId OtherUserId { get; set; }
+
+        public bool Seen { get; set; }
     }
 }

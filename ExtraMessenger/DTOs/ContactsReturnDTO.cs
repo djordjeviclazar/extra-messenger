@@ -18,6 +18,8 @@ namespace ExtraMessenger.DTOs
 
         public string OtherUserId { get; set; }
 
+        public bool Seen { get; set; }
+
         public ContactsReturnDTO(Contact contact)
         {
             Id = contact.Id.ToString();
@@ -25,6 +27,7 @@ namespace ExtraMessenger.DTOs
             Status = contact.Status;
             Name = contact.Name;
             OtherUserId = contact.OtherUserId.ToString();
+            Seen = contact.Seen;
         }
     }
 }

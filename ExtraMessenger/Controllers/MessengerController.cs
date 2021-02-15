@@ -63,7 +63,6 @@ namespace ExtraMessenger.Controllers
         [HttpGet("messages/{chatInteractionId}")]
         public async Task<IActionResult> GetMessages(string chatInteractionId)
         {
-            string real = User.FindFirst(ClaimTypes.Name).Value;
             ObjectId id = new ObjectId(chatInteractionId);
 
             var data = _context.GetDb;
@@ -73,6 +72,26 @@ namespace ExtraMessenger.Controllers
             chatInteraction.Messages.Sort((x, y) => DateTime.Compare(y.DateSent, x.DateSent));
 
             return new JsonResult(chatInteraction.Messages.Select(m => new MessageReturnDTO(m)));
+        }
+
+        [HttpGet("seenall/{contactId}")]
+        public async Task<IActionResult> SeenAllMessages(string contactId)
+        {
+            ObjectId currentUserId = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            ObjectId id = ObjectId.Parse(contactId);
+
+            var data = _context.GetDb;
+            var userCollection = data.GetCollection<User>("Users");
+
+            var filterUser = Builders<User>.Filter.Eq("_id", currentUserId);
+            var filterContact = Builders<Contact>.Filter.Eq("_id", id);
+            var filterContactList = Builders<User>.Filter.ElemMatch(user => user.Contacts, filterContact);
+            var filter = Builders<User>.Filter.And(filterUser, filterContactList);
+
+            var update = Builders<User>.Update.Set(userOrigin => userOrigin.Contacts[-1].Seen, true);
+            await userCollection.UpdateOneAsync(filter, update);
+
+            return Ok();
         }
         /*ovo ne ovde
         [HttpPost("send/")]
