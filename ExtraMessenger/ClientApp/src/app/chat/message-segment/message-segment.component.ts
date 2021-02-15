@@ -48,11 +48,11 @@ export class MessageSegmentComponent implements OnInit {
 
     this.threadChange$ = this._messageService.messageThread
       .asObservable().subscribe(data => {
+        this._messageService.currentChatInteraction = data?.chatInteractionId;
         this._messageService.getMessages()?.subscribe(data => {
           this.messagesSubject.next(data)
           this.messages = data
         });
-
       });
   }
   processReceivedMessage(data: ReceivedMessageDto) {

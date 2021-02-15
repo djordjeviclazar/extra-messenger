@@ -1,17 +1,17 @@
 <div class="message-thread shadow-sm p-3 mb-3 rounded h-100 d-flex flex-column-reverse">
+  <div class="row d-flex justify-content-center">
+    <mat-form-field class="w-75">
+      <mat-label>Message</mat-label>
+      <input matInput type="text" placeholder="Enter Message..." [(ngModel)]="messageToSend" id="messageToSend"
+             name="messageToSend" class="text-white p-1 mb-2 rounded align-self-center"
+             (keyup.enter)="sendMessage()">
+    </mat-form-field>
+    <button mat-icon-button type="button" color="accent" class="shadow-sm rounded ml-1" style="height: 35px; align-self: center"
+            (click)="sendMessage()">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
   <ng-container *ngIf="(messages$ | async) as messages">
-    <div *ngIf="messages.length > 0" class="row d-flex justify-content-center">
-      <mat-form-field class="w-75">
-        <mat-label>Message</mat-label>
-        <input matInput type="text" placeholder="Enter Message..." [(ngModel)]="messageToSend" id="messageToSend"
-               name="messageToSend" class="text-white p-1 mb-2 rounded align-self-center"
-               (keyup.enter)="sendMessage()">
-      </mat-form-field>
-      <button mat-icon-button type="button" color="accent" class="shadow-sm rounded ml-1" style="height: 35px; align-self: center"
-              (click)="sendMessage()">
-        <mat-icon>send</mat-icon>
-      </button>
-    </div>
     <div style="overflow: scroll; overflow-x: hidden; max-height: 630px;" class="d-flex flex-column-reverse">
       <div *ngFor="let message of messages" class="m-3">
         <ng-template [ngIf]="message.sender === _authService._decodedToken.unique_name"

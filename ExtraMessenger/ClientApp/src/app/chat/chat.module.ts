@@ -16,6 +16,7 @@ import { EditMessageDialogComponent } from './message-segment/edit-message-dialo
 import { DeleteMessageDialogComponent } from './message-segment/delete-message-dialog/delete-message-dialog.component';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     ReactiveFormsModule,
     MatInputModule,
     MatFormFieldModule,
+    HttpClientModule
   ]
 })
 export class ChatModule { }

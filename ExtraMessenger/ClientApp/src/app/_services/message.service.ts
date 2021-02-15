@@ -7,6 +7,7 @@ import { isNullOrUndefined } from 'util';
 import { environment } from '../../environments/environment';
 import { MessageReturnDto } from '../_DTOs/messageReturnDto';
 import { ReceivedMessageDto } from '../_DTOs/receivedMessageDto';
+import { AlertifyService } from './alertify.service';
 import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class MessageService {
   _message: string = '';
   _hubConnection: signalR.HubConnection;
   _receivers: any[] = [];
+  currentChatInteraction: string;
   messageThread = new BehaviorSubject<{ recieverId: string, chatInteractionId: string }>({
     recieverId: "-2",
     chatInteractionId: "-2"
@@ -69,6 +71,8 @@ export class MessageService {
   public addRecievedMessageListener = () => {
     this._hubConnection.on('receivedMessage', (receivedMessageDto: ReceivedMessageDto) => {
       this.messageArrived.next(receivedMessageDto);
+      if(this.currentChatInteraction != receivedMessageDto.chatInteractionId)
+        this.alertify.message('New Message From: ' + receivedMessageDto.message.sender)
     })
 
     this._hubConnection.on('editedMessage', (editedMessageDto: ReceivedMessageDto) => {
@@ -88,7 +92,8 @@ export class MessageService {
 
   constructor(
     private _http: HttpClient,
-    private _authService: AuthService
+    private _authService: AuthService,
+    private alertify: AlertifyService
   ) {
   }
 
