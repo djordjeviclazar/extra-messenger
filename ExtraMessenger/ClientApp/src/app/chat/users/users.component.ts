@@ -11,7 +11,7 @@ import { MessageService } from 'src/app/_services/message.service';
 })
 export class UsersComponent implements OnInit {
 
-  users$ = this.router.get<any[]>('https://localhost:5001/api/user/all').pipe(
+  users$ = this.router.get<any[]>('https://localhost:5001/api/user/explore').pipe(
     map(users => users.map(u => {
         let user = Math.floor(Math.random() * 100) + 1 > 50 ? 'men' : 'women';
         u.image = `https://randomuser.me/api/portraits/${user}/${Math.floor(Math.random() * 50) + 1}.jpg`

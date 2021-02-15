@@ -25,6 +25,30 @@ namespace ExtraMessenger.Controllers
             _mongoService = mongoService;
         }
 
+        [HttpGet("explore")]
+        public async Task<IActionResult> ExploreUsers()
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var db = _mongoService.GetDb;
+
+            var userCollection = db.GetCollection<User>("Users");
+
+
+            // var users = await userCollection.FindAsync<User>(new BsonDocument());
+            var filterContacts = Builders<User>.Filter.Eq(u => u.Id, currentUser);
+            //var users = await userCollection.FindAsync<User>(filter);
+            User currentDocument = (await userCollection.FindAsync<User>(filterContacts)).First<User>();
+            var contactsArray = currentDocument.Contacts.Select(x => x.OtherUserId);
+
+            var filter = Builders<User>.Filter.And(!filterContacts & Builders<User>.Filter.Nin("_id", contactsArray));
+            var users = await userCollection.Aggregate<User>().Match(filter)
+                                                              .Limit(20)
+                                                              .ToListAsync();
+                                                              //.ToString();
+            return Ok(users.Select(x => new UserDTO { ObjectId = x.Id.ToString(), Username = x.Username }));
+        }
+
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
         {
