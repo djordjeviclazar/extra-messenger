@@ -6,10 +6,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-
+  collapse = false;
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  toggle() {
+    this.collapse = !this.collapse;
   }
 
 }

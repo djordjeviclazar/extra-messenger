@@ -6,3 +6,27 @@
   padding-bottom: 70px;
   background-color: #242526;
 }
+
+.contactsSidebar{
+
+}
+
+.round {
+  border-radius: 50%;
+  
+}
+
+.centerDiv {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.remaining {
+  flex-grow: 1;
+}
+
+.collapse{
+    
+    
+}

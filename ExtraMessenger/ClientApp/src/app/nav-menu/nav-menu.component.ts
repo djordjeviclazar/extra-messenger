@@ -39,7 +39,7 @@ export class NavMenuComponent implements OnInit {
       this.registerDialogRef.close();
     this.loginDialogRef = this._matDialog.open(LoginComponent, {
       width: '450px',
-      height: '250px',
+      height: '270px',
     });
 
     this.loginDialogRef.afterClosed().subscribe(() => {

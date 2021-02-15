@@ -1,6 +1,8 @@
 .example-card {
-  max-width: 400px;
+  max-width: 200px;
   margin-right: 5px;
+  margin-top: 5px;
+  flex: 1 0 21%;
 }
 
 .example-header-image {
@@ -13,4 +15,5 @@
   display: flex;
   justify-content: space-evenly;
   overflow-y: auto;
+  flex-wrap: wrap;
 }
