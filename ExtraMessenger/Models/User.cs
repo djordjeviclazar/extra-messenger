@@ -19,5 +19,8 @@ namespace ExtraMessenger.Models
 
         
         public List<Contact> Contacts { get; set; }
+
+        public string OAuthToken { get; set; }
+        public string CSRF { get; set; }
     }
 }

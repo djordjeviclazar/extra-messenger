@@ -79,4 +79,8 @@ export class NavMenuComponent implements OnInit {
   navigateUsers() {
     this._router.navigate(['/chat/users']);
   }
+  
+  navigateRepoFetch() {
+    this._router.navigate(['repo/fetch']);
+  }
 }

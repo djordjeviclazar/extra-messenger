@@ -13,6 +13,8 @@ using ExtraMessenger.Services.Authentication.Interfaces;
 using ExtraMessenger.Services.Authentication;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Neo4jClient;
+using System;
 
 namespace ExtraMessenger
 {
@@ -71,6 +73,14 @@ namespace ExtraMessenger
                             }
                         };
                     });
+            // Neo4j:
+            string pass = Configuration.GetSection("Neo4JTestSettingsL").GetSection("Pass").Value;
+            string user = Configuration.GetSection("Neo4JTestSettingsL").GetSection("Username").Value;
+
+            var client = new GraphClient(new Uri(Configuration.GetConnectionString("Neo4JDB")), user, pass);
+            Task task = Task.Run(async () => await client.ConnectAsync());
+            task.Wait();
+            services.AddSingleton<IGraphClient>(client);
 
             //MongoDB:
             services.Configure<MongoDBSettings>(Configuration.GetSection("MongoDBSettings"));

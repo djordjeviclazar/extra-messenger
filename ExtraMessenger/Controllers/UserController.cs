@@ -41,6 +41,7 @@ namespace ExtraMessenger.Controllers
             User currentDocument = (await userCollection.FindAsync<User>(filterContacts)).First<User>();
             var contactUsers = currentDocument.Contacts;
 
+            int sampleSize = 5;
             List<User> users;
             if (contactUsers != null)
             {
@@ -48,7 +49,8 @@ namespace ExtraMessenger.Controllers
 
                 var filter = Builders<User>.Filter.And(!filterContacts & Builders<User>.Filter.Nin("_id", contactsArray));
                 users = await userCollection.Aggregate<User>().Match(filter)
-                                                                  .Limit(20)
+                                                                //.Limit(20)
+                                                                  .AppendStage<User>($@"{{ $sample: {{ size: {sampleSize} }} }}")
                                                                   .ToListAsync();
                                                                 //.ToString();
             }
@@ -56,6 +58,7 @@ namespace ExtraMessenger.Controllers
             {
                 users = await userCollection.Aggregate<User>().Match(!filterContacts)
                                                                   .Limit(20)
+                                                                  .AppendStage<User>($@"{{ $sample: {{ size: {sampleSize} }} }}")
                                                                   .ToListAsync();
                 //.ToString();
             }
@@ -86,6 +89,22 @@ namespace ExtraMessenger.Controllers
             });
 
             return Ok(usersToReturn);
+        }
+
+        [HttpGet("getoauth")]
+        public async Task<IActionResult> GetOAuth()
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var db = _mongoService.GetDb;
+
+            var userCollection = db.GetCollection<User>("Users");
+
+            var filter = Builders<User>.Filter.Eq("Id", currentUser);
+
+            var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
+
+            return Ok(!String.IsNullOrEmpty(user.OAuthToken));
         }
     }
 }

@@ -152,6 +152,8 @@ namespace ExtraMessenger.Hubs
 
                     var update = Builders<User>.Update.Set(userOrigin => userOrigin.Contacts[-1].Seen, false);
                     await userCollection.UpdateOneAsync(filter, update);
+
+
                 }
             }
 
