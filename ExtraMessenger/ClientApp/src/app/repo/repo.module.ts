@@ -22,8 +22,8 @@ import { ReporouterComponent } from './reporouter.component';
       {
         path: '', component: FetchreposComponent,
         children: [
-          { path: '', component: FetchreposComponent, pathMatch: 'full' },
-          { path: 'fetch', component: FetchreposComponent, pathMatch: 'full' }
+          //{ path: '', component: FetchreposComponent, pathMatch: 'prefix' },
+          { path: 'fetchrepo', component: FetchreposComponent, pathMatch: 'prefix' }
         ]
       }
     ]),

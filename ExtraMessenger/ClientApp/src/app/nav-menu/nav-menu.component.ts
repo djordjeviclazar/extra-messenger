@@ -81,6 +81,6 @@ export class NavMenuComponent implements OnInit {
   }
   
   navigateRepoFetch() {
-    this._router.navigate(['repo/fetch']);
+    this._router.navigate(['repo/fetchrepo']);
   }
 }

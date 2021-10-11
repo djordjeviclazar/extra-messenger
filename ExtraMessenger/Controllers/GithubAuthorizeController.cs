@@ -1,4 +1,5 @@
 ﻿using ExtraMessenger.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -62,6 +63,7 @@ namespace ExtraMessenger.Controllers
             }
 
             return Ok(new { Status = result, Message = message, Token = jwt });*/
+            var header = _configuration.GetSection("GithubOAuth:AppHeader").Value;
             GitHubClient gitHubClient = new GitHubClient(new ProductHeaderValue(_configuration.GetSection("GithubOAuth:AppHeader").Value));
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -83,6 +85,7 @@ namespace ExtraMessenger.Controllers
 
             string csrf = tokenHandler.WriteToken(createdToken);
 
+            var aaa = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var db = _mongoService.GetDb;
