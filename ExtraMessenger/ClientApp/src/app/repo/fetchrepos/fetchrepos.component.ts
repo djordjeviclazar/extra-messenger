@@ -35,7 +35,7 @@ export class FetchreposComponent implements OnInit {
       }
       else {
 
-        this.router.post<string>('https://localhost:5001/api/githubauthorize/authorize', {
+        this.router.post<string>('https://localhost:5001/api/githubauthorize/authorize', null, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }
