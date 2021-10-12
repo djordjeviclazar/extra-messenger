@@ -15,6 +15,8 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Neo4jClient;
 using System;
+using ExtraMessenger.Services.Github.Interfaces;
+using ExtraMessenger.Services.Github;
 
 namespace ExtraMessenger
 {
@@ -82,12 +84,15 @@ namespace ExtraMessenger
             task.Wait();
             services.AddSingleton<IGraphClient>(client);
 
-            //MongoDB:
+            // MongoDB:
             services.Configure<MongoDBSettings>(Configuration.GetSection("MongoDBSettings"));
 
             services.AddSingleton<IMongoDBSettings>(sp => sp.GetRequiredService<IOptions<MongoDBSettings>>().Value);
 
             services.AddSingleton<MongoService>();
+
+            // Github:
+            services.AddScoped<IGithubClientService, GithubClientService>();
 
             services.AddSignalR();
 

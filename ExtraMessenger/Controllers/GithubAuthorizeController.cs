@@ -43,7 +43,7 @@ namespace ExtraMessenger.Controllers
         public async Task<IActionResult> Аuthorize()
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var gitHubClient = _githubClientService.GetGitHubClient(currentUser);
+            var gitHubClient = _githubClientService.GetGitHubClient();
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Secret").Value);
@@ -83,7 +83,7 @@ namespace ExtraMessenger.Controllers
         public async Task<IActionResult> AddOAuthToken(string code, string state)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var gitHubClient = _githubClientService.GetGitHubClient(currentUser);
+            var gitHubClient = _githubClientService.GetGitHubClient();
 
             var db = _mongoService.GetDb;
             var userCollection = db.GetCollection<Models.User>("Users");
@@ -100,6 +100,22 @@ namespace ExtraMessenger.Controllers
             var update = Builders<Models.User>.Update.Set("OAuthToken", token);
             await userCollection.UpdateOneAsync(filter, update);
             return Ok();
+        }
+
+        [HttpGet("getoauth")]
+        public async Task<IActionResult> GetOAuth()
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var db = _mongoService.GetDb;
+
+            var userCollection = db.GetCollection<Models.User>("Users");
+
+            var filter = Builders<Models.User>.Filter.Eq("Id", currentUser);
+
+            var user = (await userCollection.FindAsync<Models.User>(filter)).FirstOrDefault();
+
+            return Ok(!String.IsNullOrEmpty(user.OAuthToken));
         }
     }
 }

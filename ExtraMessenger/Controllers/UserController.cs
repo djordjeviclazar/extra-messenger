@@ -90,21 +90,5 @@ namespace ExtraMessenger.Controllers
 
             return Ok(usersToReturn);
         }
-
-        [HttpGet("getoauth")]
-        public async Task<IActionResult> GetOAuth()
-        {
-            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            var db = _mongoService.GetDb;
-
-            var userCollection = db.GetCollection<User>("Users");
-
-            var filter = Builders<User>.Filter.Eq("Id", currentUser);
-
-            var user = (await userCollection.FindAsync<User>(filter)).FirstOrDefault();
-
-            return Ok(!String.IsNullOrEmpty(user.OAuthToken));
-        }
     }
 }
