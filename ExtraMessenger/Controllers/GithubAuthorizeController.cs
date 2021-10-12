@@ -1,4 +1,5 @@
 ﻿using ExtraMessenger.Data;
+using ExtraMessenger.Services.Github;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,46 +26,24 @@ namespace ExtraMessenger.Controllers
         private readonly MongoService _mongoService;
         private readonly IGraphClient _graphClient;
         private readonly IConfiguration _configuration;
+        private readonly GithubClientService _githubClientService;
 
         public GithubAuthorizeController(IConfiguration configuration,
             MongoService mongoService,
-            IGraphClient graphClient)
+            IGraphClient graphClient,
+            GithubClientService githubClientService)
         {
             _mongoService = mongoService;
             _graphClient = graphClient;
             _configuration = configuration;
+            _githubClientService = githubClientService;
         }
 
         [HttpPost("authorize")]
         public async Task<IActionResult> Аuthorize()
         {
-            /*
-            bool result;
-            string message;
-            string jwt = null;
-            try
-            {
-                var user = await _authenticationService.Login(userLoginInfo.Username, userLoginInfo.Password);
-                if (user != null)
-                {
-                    result = true;
-                    message = "Successfully logged in.";
-                    jwt = GenerateToken(user);
-                }
-                else
-                {
-                    result = false;
-                    message = "Invalid username/password combination.";
-                }
-            }
-            catch (Exception e)
-            {
-                return Problem(e.Message);
-            }
-
-            return Ok(new { Status = result, Message = message, Token = jwt });*/
-            var header = _configuration.GetSection("GithubOAuth:AppHeader").Value;
-            GitHubClient gitHubClient = new GitHubClient(new ProductHeaderValue(_configuration.GetSection("GithubOAuth:AppHeader").Value));
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var gitHubClient = _githubClientService.GetGitHubClient(currentUser);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Secret").Value);
@@ -81,19 +60,12 @@ namespace ExtraMessenger.Controllers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
             var createdToken = tokenHandler.CreateToken(tokenDescriptor);
-            
 
             string csrf = tokenHandler.WriteToken(createdToken);
 
-            var aaa = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
             var db = _mongoService.GetDb;
-
             var userCollection = db.GetCollection<Models.User>("Users");
-
             var filter = Builders<Models.User>.Filter.Eq("Id", currentUser);
-
             var update = Builders<Models.User>.Update.Set("CSRF", csrf);
             await userCollection.UpdateOneAsync(filter, update);
 
@@ -110,21 +82,15 @@ namespace ExtraMessenger.Controllers
         [HttpPost("addoauthtoken")]
         public async Task<IActionResult> AddOAuthToken(string code, string state)
         {
-            GitHubClient gitHubClient = new GitHubClient(new ProductHeaderValue(_configuration.GetSection("GithubOAuth:AppHeader").Value));
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var gitHubClient = _githubClientService.GetGitHubClient(currentUser);
 
             var db = _mongoService.GetDb;
-
             var userCollection = db.GetCollection<Models.User>("Users");
-
             var filter = Builders<Models.User>.Filter.Eq("Id", currentUser);
-
             var user = (await userCollection.FindAsync<Models.User>(filter)).FirstOrDefault();
-
             if (!user.CSRF.Equals(state)) { throw new InvalidOperationException("SECURITY FAIL!"); }
             //Session["CSRF:State"]
-
-            var updateFilter = Builders<Models.User>.Filter.Eq("Id", currentUser);
             
             var token = await gitHubClient.Oauth.CreateAccessToken(
                 new OauthTokenRequest(_configuration.GetSection("GithubOAuth:ClientId").Value,
