@@ -21,5 +21,6 @@ namespace ExtraMessenger.Data
         }
 
         public IMongoDatabase GetDb { get { return _database; } }
+        public IMongoDBSettings GetDBSettings { get { return _settings; } }
     }
 }
