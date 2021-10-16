@@ -81,7 +81,7 @@ namespace ExtraMessenger.Controllers
                 await userCollection.UpdateOneAsync(filterUser, updateUser); // update date
                 var updateUserRepositories = Builders<Models.User>.Update.PushEach<Repository>(u => u.Repositories, resultList);
                 await userCollection.UpdateManyAsync(filterUser, updateUserRepositories); // update Repository list of user
-
+                
                 // store in Neo4J
                 var query = _neoContext.Cypher
                     .Unwind(resultList, "repo")
@@ -91,7 +91,7 @@ namespace ExtraMessenger.Controllers
                     .With("(r)")
                     .Match("(u:User {Id:'" + currentUser.ToString() + "'})")
                     .Merge("(u)-[rel:OWNS]->(r)");
-                var queryText = query.Query.DebugQueryText;
+                //var queryText = query.Query.DebugQueryText;
                 await query.ExecuteWithoutResultsAsync();
 
 
@@ -116,7 +116,7 @@ namespace ExtraMessenger.Controllers
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var client = _githubClientService.GetGitHubClient(currentUser);
 
-            // Get last fetched time:
+            
             var mongoDb = _mongoService.GetDb;
             var mongoSettings = _mongoService.GetDBSettings;
             var userCollection = mongoDb.GetCollection<Models.User>(mongoSettings.UserCollectionName);

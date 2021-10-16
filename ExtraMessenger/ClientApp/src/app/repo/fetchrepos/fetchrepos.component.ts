@@ -11,11 +11,17 @@ export class FetchreposComponent implements OnInit {
   _jwtHelper = new JwtHelperService();
   oauth: string;
   reposObservable: any;
+  oldReposObservable: any;
 
   constructor(private router: HttpClient) { }
 
   ngOnInit(): void {
     this.oauth = this._jwtHelper.decodeToken(localStorage.getItem('authToken')).userdata;
+    this.oldReposObservable = this.router.get<boolean>('https://localhost:5001/api/repo/getrepos', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+      }
+    });
   }
 
   fetchrepos() {
@@ -30,7 +36,12 @@ export class FetchreposComponent implements OnInit {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }
-        })
+        });
+        this.oldReposObservable = this.router.get<boolean>('https://localhost:5001/api/repo/getrepos', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          }
+        });
       }
       else {
         this.router.post<string>('https://localhost:5001/api/githubauthorize/authorize', null, {
