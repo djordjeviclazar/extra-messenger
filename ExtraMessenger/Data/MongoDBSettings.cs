@@ -15,6 +15,8 @@ namespace ExtraMessenger.Data
 
         public string TutorialsCollectionName { get; set; }
 
+        public string OGitAuthCollectionName { get; set; }
+
         public string ConnectionString { get; set; }
 
         public string DatabaseName { get; set; }
@@ -29,6 +31,8 @@ namespace ExtraMessenger.Data
         public string ReposCollectionName { get; set; }
 
         public string TutorialsCollectionName { get; set; }
+
+        public string OGitAuthCollectionName { get; set; }
 
         string ConnectionString { get; set; }
 

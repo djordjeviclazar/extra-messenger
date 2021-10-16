@@ -92,7 +92,7 @@ namespace ExtraMessenger
             services.AddSingleton<MongoService>();
 
             // Github:
-            services.AddScoped<IGithubClientService, GithubClientService>();
+            services.AddSingleton<IGithubClientService, GithubClientService>();
 
             services.AddSignalR();
 

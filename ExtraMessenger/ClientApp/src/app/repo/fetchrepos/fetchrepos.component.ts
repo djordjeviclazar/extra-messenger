@@ -19,14 +19,14 @@ export class FetchreposComponent implements OnInit {
   }
 
   fetchrepos() {
-    let response = this.router.get<boolean>('https://localhost:5001/api/user/getoauth', {
+    let response = this.router.get<boolean>('https://localhost:5001/api/githubauthorize/getoauth', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
     });
     response.subscribe(isOAuth => {
       if (isOAuth) {//this.oauth != null
-        this.reposObservable = this.router.get<any[]>('https://localhost:5001/api/repo/getrepos', {
+        this.reposObservable = this.router.get<any[]>('https://localhost:5001/api/repo/fetchrepos', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }

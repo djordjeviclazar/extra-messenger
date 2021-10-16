@@ -19,5 +19,9 @@ namespace ExtraMessenger.DTOs
         public string Name { get; set; }
 
         public string Language { get; set; }
+
+        public int OpenIssues { get; set; }
+
+        public bool IsPublic { get; set; }
     }
 }

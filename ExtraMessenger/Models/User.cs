@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +23,9 @@ namespace ExtraMessenger.Models
 
         public string OAuthToken { get; set; }
         public string CSRF { get; set; }
+
+        public DateTime? LastFetchedRepo { get; set; }
+        public DateTime? LastFetchedIssue { get; set; }
+        public List<Repository> Repositories { get; set; }
     }
 }

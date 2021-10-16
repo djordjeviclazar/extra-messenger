@@ -1,3 +1,26 @@
 <div class="main-container">
   <button color="secondary" mat-raised-button (click)="fetchrepos()">Fetch</button>
+  <div class="users">
+    <mat-card *ngFor="let repo of (reposObservable | async) as repos" class="example-card">
+      <mat-card-header>
+        <div mat-card-avatar style="background-image: url(assets/check.png);
+            background-size: cover;"></div>
+        <mat-card-title>{{repo.Name | titlecase}}</mat-card-title>
+        <mat-card-subtitle>
+          <div *ngIf="repo.IsPublic; else elseBlock">
+            <span class="material-icons" style="color: white; margin-left: 20px;">lock_open</span> Public
+          </div>
+          <ng-template #elseBlock>
+            <span class="material-icons" style="color: white; margin-left: 20px;">lock</span> Private
+          </ng-template>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        Open issues: {{repo.OpenIssues}}
+      </mat-card-content>
+      <mat-card-actions>
+        <button color="primary" mat-raised-button (click)="openChatModal(user.objectId)">Fetch/Sync Issues</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 </div>

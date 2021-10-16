@@ -14,28 +14,35 @@ namespace ExtraMessenger.Services.Github
 {
     public class GithubClientService : IGithubClientService
     {
-        //private readonly GithubClientCache _cache = new GithubClientCache();
-        private readonly GitHubClient _githubClient;
+        private readonly GithubClientCache _cache = new GithubClientCache();
+        //private readonly GitHubClient _githubClient;
         private readonly IConfiguration _configuration;
 
         public GithubClientService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _githubClient = new GitHubClient(new ProductHeaderValue(_configuration.GetSection("GithubOAuth:AppHeader").Value));
+            //_githubClient = new GitHubClient(new ProductHeaderValue(_configuration.GetSection("GithubOAuth:AppHeader").Value));
         }
 
-        public GitHubClient GetGitHubClient()
+        public GitHubClient GetGitHubClient(ObjectId id)
         {
-            return _githubClient;
+            var result = _cache.GetClient(id);
+            if (result == null)
+            {
+                result = new GitHubClient(new ProductHeaderValue(_configuration.GetSection("GithubOAuth:AppHeader").Value));
+                _cache.Add(id, result);
+            }
+            return result;
         }
 
         public async Task<List<Issue>> GetMyOpenIssues(ObjectId id)
         {
+            var githubClient = GetGitHubClient(id);
 
             List<Issue> issues = new List<Issue>();
             var request = new SearchIssuesRequest();
             request.State = ItemState.Open;
-            var result = await _githubClient.Search.SearchIssues(request);
+            var result = await githubClient.Search.SearchIssues(request);
 
             issues = result.Items.ToList();
             return issues;
@@ -43,13 +50,17 @@ namespace ExtraMessenger.Services.Github
 
         public async Task<List<Repository>> GetMyRepositories(ObjectId id)
         {
-            var repos = await _githubClient.Repository.GetAllForCurrent();
+            var githubClient = GetGitHubClient(id);
+
+            var repos = await githubClient.Repository.GetAllForCurrent();
             return repos.ToList();
         }
 
         public async Task<Repository> GetRepository(ObjectId id, string name, string owner)
         {
-            return await _githubClient.Repository.Get(owner, name);
+            var githubClient = GetGitHubClient(id);
+
+            return await githubClient.Repository.Get(owner, name);
         }
     }
 }
