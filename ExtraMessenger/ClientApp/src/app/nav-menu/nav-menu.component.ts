@@ -80,7 +80,7 @@ export class NavMenuComponent implements OnInit {
     this._router.navigate(['/chat/users']);
   }
   
-  navigateRepoFetch() {
-    this._router.navigate(['repo/fetchrepo']);
+  navigateRepoComponent() {
+    this._router.navigate(['/repo']);
   }
 }

@@ -126,6 +126,7 @@ namespace ExtraMessenger.Controllers
             return Ok(user.Repositories.Select(x => new RepoDTO
             {
                 Id = x.Id,
+                RepoUrl = x.HtmlUrl,
                 OpenIssues = x.OpenIssuesCount,
                 IsPublic = !x.Private,
                 Name = x.Name,

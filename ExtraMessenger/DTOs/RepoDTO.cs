@@ -23,5 +23,6 @@ namespace ExtraMessenger.DTOs
         public int OpenIssues { get; set; }
 
         public bool IsPublic { get; set; }
+        public string RepoUrl { get; set; }
     }
 }

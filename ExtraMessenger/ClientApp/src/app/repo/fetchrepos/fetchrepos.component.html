@@ -1,4 +1,6 @@
+
 <div class="main-container">
+  <app-reposidebar></app-reposidebar>
   <button color="secondary" mat-raised-button (click)="fetchrepos()">Fetch</button>
   <div class="oldrepos">
     <mat-card *ngFor="let repo of (oldReposObservable | async) as repos" class="example-card">

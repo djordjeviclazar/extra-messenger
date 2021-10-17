@@ -17,7 +17,7 @@ export class FetchreposComponent implements OnInit {
 
   ngOnInit(): void {
     this.oauth = this._jwtHelper.decodeToken(localStorage.getItem('authToken')).userdata;
-    this.oldReposObservable = this.router.get<boolean>('https://localhost:5001/api/repo/getrepos', {
+    this.oldReposObservable = this.router.get<any[]>('https://localhost:5001/api/repo/getrepos', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
@@ -37,7 +37,7 @@ export class FetchreposComponent implements OnInit {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }
         });
-        this.oldReposObservable = this.router.get<boolean>('https://localhost:5001/api/repo/getrepos', {
+        this.oldReposObservable = this.router.get<any[]>('https://localhost:5001/api/repo/getrepos', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }

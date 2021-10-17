@@ -4,36 +4,57 @@ import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select'
 import { HttpClientModule } from '@angular/common/http';
 import { FetchreposComponent } from './fetchrepos/fetchrepos.component';
 import { ReporouterComponent } from './reporouter.component';
+import { ReposidebarComponent } from './reposidebar/reposidebar.component';
+import { CreatetutorialComponent } from './createtutorial/createtutorial.component';
 
 
 
 @NgModule({
-  declarations: [FetchreposComponent],
+  declarations: [
+    ReporouterComponent,
+    FetchreposComponent,
+    ReposidebarComponent,
+    CreatetutorialComponent
+  ],
   imports: [
     CommonModule,
     RouterModule.forChild([
+      
       {
-        path: '', component: FetchreposComponent,
+        path: '', component: ReporouterComponent, pathMatch:'full',
         children: [
           //{ path: '', component: FetchreposComponent, pathMatch: 'prefix' },
-          { path: 'fetchrepo', component: FetchreposComponent, pathMatch: 'prefix' }
+          //{ path: 'fetchrepo', component: FetchreposComponent, pathMatch: 'full' },
+          //{ path: 'createtutorial', component: CreatetutorialComponent, pathMatch: 'full' }
         ]
-      }
+      },
+      {
+        path: 'fetchrepo', component: FetchreposComponent,
+        children: []
+      },
+      {
+        path: 'createtutorial', component: CreatetutorialComponent,
+        children: []
+      },
     ]),
     MatCardModule,
     MatButtonModule,
     MatDialogModule,
+    MatDividerModule,
     FormsModule,
     MatIconModule,
     ReactiveFormsModule,
     MatInputModule,
+    MatSelectModule,
     MatFormFieldModule,
     HttpClientModule
   ]

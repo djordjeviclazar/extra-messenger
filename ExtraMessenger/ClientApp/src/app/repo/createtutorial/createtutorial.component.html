@@ -1,0 +1,54 @@
+<div class="main-form-container">
+  <app-reposidebar></app-reposidebar>
+  <mat-divider [vertical]="true"></mat-divider>
+  <div class="content-container">
+    <div class="row">
+      <mat-form-field color="accent" appearance="outline">
+        <mat-label>Title</mat-label>
+        <input matInput placeholder="Enter title" class="txb_username"  [(ngModel)]="title" (input)="onEnterTitle()">
+        <mat-error *ngIf="">Please enter title</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="row" >
+      <mat-form-field >
+        <mat-select placeholder="Select Difficulty" name="sel_difficulty" [(ngModel)]="selectedDifficulty">
+          <mat-option *ngFor="let d of (difficulties | async) as dArray" [value]="d.name">{{ d.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="row" >
+      <mat-form-field>
+        <mat-select placeholder="Select Topic" name="sel_topic" [(ngModel)]="selectedTopic">
+          <mat-option *ngFor="let t of (topics | async) as tArray" [value]="t.name">{{ t.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+
+    <div class="row">
+      <mat-form-field color="accent" >
+        <mat-label>Introduction</mat-label>
+        <textarea matNativeControl placeholder="Write something about your tutorial" [(ngModel)]="intro">
+        </textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="row" >
+      <mat-form-field >
+        <mat-select placeholder="Select Repo" name="sel_repo" [(ngModel)]="selectedRepo">
+          <mat-option *ngFor="let r of (repos | async) as rArray" [value]="r">{{ r.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="text-center strong">
+      <div class="row">
+        <button color="accent" class="btn btn-outline-success strong" [disabled]="!isFilledRequired"
+                (click)="createTutorial()">
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
