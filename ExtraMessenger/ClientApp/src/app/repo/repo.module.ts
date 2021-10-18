@@ -9,12 +9,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select'
+import { MatSelectModule } from '@angular/material/select';
+import { MatListItem, MatList, MatListModule } from '@angular/material/list';
+//import { MatExpansionPanel, MatAccordion } from '@angular/material/expansion';
 import { HttpClientModule } from '@angular/common/http';
 import { FetchreposComponent } from './fetchrepos/fetchrepos.component';
 import { ReporouterComponent } from './reporouter.component';
 import { ReposidebarComponent } from './reposidebar/reposidebar.component';
 import { CreatetutorialComponent } from './createtutorial/createtutorial.component';
+import { TutorialdetailsComponent } from './tutorialdetails/tutorialdetails.component';
+import { ProfileComponent } from './profile/profile.component';
 
 
 
@@ -23,7 +27,9 @@ import { CreatetutorialComponent } from './createtutorial/createtutorial.compone
     ReporouterComponent,
     FetchreposComponent,
     ReposidebarComponent,
-    CreatetutorialComponent
+    CreatetutorialComponent,
+    TutorialdetailsComponent,
+    ProfileComponent
   ],
   imports: [
     CommonModule,
@@ -45,11 +51,22 @@ import { CreatetutorialComponent } from './createtutorial/createtutorial.compone
         path: 'createtutorial', component: CreatetutorialComponent,
         children: []
       },
+      {
+        path: 'profile', component: ProfileComponent,
+        children: []
+      },
+      {
+        path: 'tutorialdetails/:id', component: TutorialdetailsComponent,
+        children: []
+      },
     ]),
     MatCardModule,
     MatButtonModule,
     MatDialogModule,
     MatDividerModule,
+    MatListModule,
+    //MatExpansionPanel,
+    //MatAccordion,
     FormsModule,
     MatIconModule,
     ReactiveFormsModule,

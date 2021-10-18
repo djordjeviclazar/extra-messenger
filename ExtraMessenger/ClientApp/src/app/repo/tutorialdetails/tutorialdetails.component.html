@@ -1,0 +1,24 @@
+<div class="main-form-container">
+  <app-reposidebar></app-reposidebar>
+  <mat-divider [vertical]="true"></mat-divider>
+  <div class="content-container">
+    <h2>{{tutorial.title}}</h2>
+    <mat-list>
+      <mat-list-item> <span style="color: white; margin-left: 20px;">Topic: {{tutorial.topic[0]}}</span> </mat-list-item>
+      <mat-list-item> <span style="color: white; margin-left: 20px;">Difficulty: {{tutorial.difficulty}}</span> </mat-list-item>
+      <mat-list-item>
+        <button mat-icon-button color="accent" (click)="upvote()">
+          <mat-icon>thumb_up_alt</mat-icon>
+        </button>
+      </mat-list-item>
+      <mat-list-item>
+        <button mat-icon-button color="accent" (click)="downvote()">
+          <mat-icon>thumb_down_alt</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+    <h3>Introduction</h3>
+    <p>{{tutorial.introduction}}</p>
+    <button mat-stroked-button color="accent" (click)="goToRepo()">Go to example</button>
+  </div>
+</div>

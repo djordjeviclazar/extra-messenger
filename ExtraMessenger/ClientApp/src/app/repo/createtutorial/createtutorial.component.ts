@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AlertifyService } from '../../_services/alertify.service';
+import { ActivatedRoute, Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-reporouter', //'app-createtutorial'
@@ -32,7 +34,12 @@ export class CreatetutorialComponent implements OnInit {
   });
 
 
-  constructor(private router: HttpClient, private _alertifyService: AlertifyService) { }
+  constructor(private router: HttpClient
+    , private _alertifyService: AlertifyService
+    , private _activatedRoute: ActivatedRoute
+    , private _routeNavigator: Router) {
+
+  }
 
   ngOnInit(): void {
 
@@ -59,10 +66,10 @@ export class CreatetutorialComponent implements OnInit {
 
     selectedTopics.push(this.selectedTopic);
     tutorialDto.Topics = selectedTopics;
-    
+
     part.Title = '';
     part.RepoId = this.selectedRepo.id;
-    part.RepoUrl = this.selectedRepo.HtmlUrl;
+    part.RepoUrl = this.selectedRepo.repoUrl;
     part.Description = '';
     partList.push(part);
     tutorialDto.Parts = partList;
@@ -75,6 +82,8 @@ export class CreatetutorialComponent implements OnInit {
     }).subscribe((response) => {
       if (response.success) {
         this._alertifyService.success("Tutorial created");
+        const pathToTutorial = 'https://localhost:4200/repo/tutorialdetails/'; //https://localhost:4200/repo/tutorialdetails/
+        this._routeNavigator.navigate([pathToTutorial, response.id]);
       }
       else {
         this._alertifyService.error("Error: " + response.message);

@@ -31,6 +31,6 @@ export class ReposidebarComponent implements OnInit {
   }
 
   navigateMyProfile() {
-    this._router.navigate(['repo/myprofile']);
+    this._router.navigate(['repo/profile']);
   }
 }
