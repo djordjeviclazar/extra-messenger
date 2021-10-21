@@ -120,7 +120,10 @@ namespace ExtraMessenger.Controllers
                     code));
             gitHubClient.Credentials = new Credentials(token.AccessToken);
 
-            var update = Builders<Models.User>.Update.Set("OAuthToken", token.AccessToken);
+            Octokit.User githubProfile = await gitHubClient.User.Current();
+            var update = Builders<Models.User>.Update.Set("OAuthToken", token.AccessToken)
+                                                        .Set("GithubLogin", githubProfile.Login)
+                                                        .Set("GithubFullName", githubProfile.Name);
             await userCollection.UpdateOneAsync(filter, update);
             return Ok();
         }

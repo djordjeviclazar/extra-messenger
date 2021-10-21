@@ -1,10 +1,12 @@
 ﻿using ExtraMessenger.Data;
 using ExtraMessenger.DTOs;
+using ExtraMessenger.Models.Nodes;
 using ExtraMessenger.Services.Github.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Neo4jClient;
+using Newtonsoft.Json.Linq;
 using Octokit;
 using System;
 using System.Collections.Generic;
@@ -134,6 +136,124 @@ namespace ExtraMessenger.Controllers
                 OwnerId = currentUser.ToString(),
                 Language = x.Language
             }));
+        }
+
+        [HttpGet("fetchrepoinfo/{repoId}")]
+        public async Task<IActionResult> FetchRepoInfo(long repoId)
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var client = _githubClientService.GetGitHubClient(currentUser);
+
+            var mongoDb = _mongoService.GetDb;
+            var mongoSettings = _mongoService.GetDBSettings;
+            var repoCollection = mongoDb.GetCollection<Repository>(mongoSettings.ReposCollectionName);
+            var filterRepo = Builders<Repository>.Filter.Eq(r => r.Id, repoId);
+            var repo = (await repoCollection.FindAsync<Repository>(filterRepo)).FirstOrDefault();
+            var userCollection = mongoDb.GetCollection<Models.User>(mongoSettings.UserCollectionName);
+            var filterUser = Builders<Models.User>.Filter.Eq(u => u.Id, currentUser);
+            var user = (await userCollection.FindAsync<Models.User>(filterUser)).FirstOrDefault();
+
+            var branches = await _githubClientService.GetBranches(currentUser, repo);
+            var query = _neoContext.Cypher
+                    .Unwind(branches, "branch")
+                    .Match("(r:Repo {Id:" + repo.Id + "})")
+                    .Merge("(b:Branch {Name: branch.Name})")
+                    .OnCreate().Set("b.Name = branch.Name")
+                    .Merge("(r)-[rel:HAS_BRANCH]->(b)")
+                    ;
+            var branchCreate = query.Query.DebugQueryText;
+            await query.ExecuteWithoutResultsAsync();
+
+            List<PullRequestEvent> pullRequestEvents = new List<PullRequestEvent>();
+            var gitEventsJsonArray = await _githubClientService.GetRepoEvents(user.GithubLogin, repo.Name, user.OAuthToken);
+            foreach (var a in gitEventsJsonArray)
+            {
+                var type = ((JValue)a["type"]).ToString();
+                var payload = ((JObject)a["payload"]);
+                var created = a.Value<DateTime>("created_at");
+                var createdString = created.ToString("yyyy-MM-dd") + "T" + created.ToString("HH:mm:ss") + "Z";
+                switch (type)
+                {
+                    case "PushEvent":
+                        var branch = payload["ref"].ToString();
+                        var pom = branch.Split("/");
+                        var branchName = pom[pom.Length - 1]; //
+                        PushEvent pushEvent = new PushEvent
+                        {
+                            Id = ((JValue)a["id"]).ToString(),
+                            Created = createdString
+                        };
+                        List<ComitPushNode> commits = new List<ComitPushNode>();
+                        foreach(var c in (JArray)payload["commits"])
+                        {
+                            var commitAuthor = ((JObject)c["author"]);
+                            ComitPushNode comitPushNode = new ComitPushNode
+                            {
+                                Sha = ((JValue)c["sha"]).ToString(),
+                                Message = ((JValue)c["message"]).ToString(),
+                                Author = commitAuthor["name"].ToString(),
+                                Push_Id = pushEvent.Id
+                            };
+                            commits.Add(comitPushNode);
+                        }
+
+                        // add to Neo4J
+                        var queryAddPush = _neoContext.Cypher
+                            .Match("(r:Repo {Id: " + repo.Id + $" }})-[rel1:HAS_BRANCH]->(b:Branch {{Name: '{branchName}'}})")
+                            .Merge($"(p:PushEvent {{Id:'{pushEvent.Id}'}})")
+                            .OnCreate().Set($"p.Id = '{pushEvent.Id}'")
+                            .Merge("(b)<-[rel2:PUSHED_TO]-(p)")
+                            .Set($"rel2.Created = datetime('{pushEvent.Created}')")
+                            ;
+                        var queryPushText = queryAddPush.Query.DebugQueryText;
+                        await queryAddPush.ExecuteWithoutResultsAsync();
+
+                        var queryCommitsImport = _neoContext.Cypher
+                           .Unwind(commits, "commit")
+                           .Match($"(p:PushEvent {{Id:'{pushEvent.Id}'}})")
+                           .Merge("(c:CommitPush {Sha: commit.Sha})")
+                           .OnCreate().Set("c.Sha = commit.Sha, c.Author = commit.Author, c.Message = commit.Message, c.Push_Id = commit.Push_Id")
+                           .Merge("(p)-[rel:CONTAINS_COMMIT]->(c)")
+                           ;
+                        var queryCommitsText = queryCommitsImport.Query.DebugQueryText;
+                        await queryCommitsImport.ExecuteWithoutResultsAsync();
+
+                        break;
+                    case "PullRequestEvent":
+
+                        var pullRequestInfo = (JObject)payload["pull_request"];
+                        JObject headBranch = (JObject)pullRequestInfo["head"], baseBranch = (JObject)pullRequestInfo["base"];
+                        PullRequestEvent pullRequestEvent = new PullRequestEvent
+                        {
+                            Id = ((JValue)a["id"]).ToString(),
+                            Action = ((JValue)payload["action"]).ToString(),
+                            CreatedAt = createdString,
+                            Merged = (bool)pullRequestInfo["merged"],
+                            PullRequestUrl = ((JValue)pullRequestInfo["url"]).ToString(),
+                            BaseBranch = ((JValue)baseBranch["ref"]).ToString(),
+                            HeadBranch = ((JValue)headBranch["ref"]).ToString()
+                        };
+
+                        if (pullRequestEvent.Action == "closed")
+                        {
+                            var queryPullRequest = _neoContext.Cypher
+                                .Match($"(r {{Id: {repoId} }})-[:HAS_BRANCH]->(b1:Branch {{Name: '{pullRequestEvent.HeadBranch}'}})")
+                                .Match($"(r)-[:HAS_BRANCH]->(b2:Branch {{Name: '{pullRequestEvent.BaseBranch}'}})")
+                            .Merge($"(b1)-" +
+                                    $"[rel:MERGED_INTO {{Id: '{pullRequestEvent.Id}', " +
+                                    $"CreatedAt:datetime('{pullRequestEvent.CreatedAt}')}}]" +
+                                    $"->(b2)")
+                            ;
+                            var queryPullRequestText = queryPullRequest.Query.DebugQueryText;
+                            await queryPullRequest.ExecuteWithoutResultsAsync();
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return Ok();
         }
     }
 }

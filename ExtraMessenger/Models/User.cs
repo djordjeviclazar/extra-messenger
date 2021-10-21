@@ -24,6 +24,9 @@ namespace ExtraMessenger.Models
         public string OAuthToken { get; set; }
         public string CSRF { get; set; }
 
+        public string GithubLogin { get; set; }
+        public string GithubFullName { get; set; }
+
         public DateTime? LastFetchedRepo { get; set; }
         public DateTime? LastFetchedIssue { get; set; }
         public List<Repository> Repositories { get; set; }
