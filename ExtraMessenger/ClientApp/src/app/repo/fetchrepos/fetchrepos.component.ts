@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Component({
@@ -13,19 +14,27 @@ export class FetchreposComponent implements OnInit {
   reposObservable: any;
   oldReposObservable: any;
 
-  constructor(private router: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.oauth = this._jwtHelper.decodeToken(localStorage.getItem('authToken')).userdata;
-    this.oldReposObservable = this.router.get<any[]>('https://localhost:5001/api/repo/getrepos', {
+    this.oldReposObservable = this.http.get<any[]>('https://localhost:5001/api/repo/getrepos', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
     });
   }
 
+  goToBranches(repoId: any) {
+    this.router.navigate(['../branchanalyze', repoId], { relativeTo: this.activatedRoute });
+  }
+
+  goToPushes(repoId: any) {
+    this.router.navigate(['../pushanalyze', repoId], { relativeTo: this.activatedRoute });
+  }
+
   fetchRepoInfo(id: any) {
-    let response = this.router.get<boolean>('https://localhost:5001/api/repo/fetchrepoinfo/' + id, {
+    let response = this.http.get<boolean>('https://localhost:5001/api/repo/fetchrepoinfo/' + id, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
@@ -34,26 +43,26 @@ export class FetchreposComponent implements OnInit {
   }
 
   fetchrepos() {
-    let response = this.router.get<boolean>('https://localhost:5001/api/githubauthorize/getoauth', {
+    let response = this.http.get<boolean>('https://localhost:5001/api/githubauthorize/getoauth', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
     });
     response.subscribe(isOAuth => {
       if (isOAuth) {//this.oauth != null
-        this.reposObservable = this.router.get<any[]>('https://localhost:5001/api/repo/fetchrepos', {
+        this.reposObservable = this.http.get<any[]>('https://localhost:5001/api/repo/fetchrepos', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }
         });
-        this.oldReposObservable = this.router.get<any[]>('https://localhost:5001/api/repo/getrepos', {
+        this.oldReposObservable = this.http.get<any[]>('https://localhost:5001/api/repo/getrepos', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }
         });
       }
       else {
-        this.router.post<string>('https://localhost:5001/api/githubauthorize/authorize', null, {
+        this.http.post<string>('https://localhost:5001/api/githubauthorize/authorize', null, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -11,21 +11,16 @@ export class TutorialdetailsComponent implements OnInit {
   id: string;
   tutorial: any;
 
-  constructor(private _activatedRoute: ActivatedRoute, private router: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this._activatedRoute.paramMap.subscribe(params => {
-      this.id = params.get('id');
-      let path = 'https://localhost:5001/api/tutorial/gettutorial/' + this.id;
-      let response = this.router.get<any>(path, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        }
-      });
-      response.subscribe(x => {
-        this.tutorial = x;
-      });
-    })
+    this.activatedRoute.params.subscribe((params: Params) => {
+      this.id = params['id'];
+    });
+    this.activatedRoute.data.subscribe((data) => {
+      console.log(data);
+      this.tutorial = data;
+    });
   }
 
   goToRepo() {

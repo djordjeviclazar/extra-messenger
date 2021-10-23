@@ -19,6 +19,12 @@ import { ReposidebarComponent } from './reposidebar/reposidebar.component';
 import { CreatetutorialComponent } from './createtutorial/createtutorial.component';
 import { TutorialdetailsComponent } from './tutorialdetails/tutorialdetails.component';
 import { ProfileComponent } from './profile/profile.component';
+import { BranchanalyzeComponent } from './branchanalyze/branchanalyze.component';
+import { PushanalyzeComponent } from './pushanalyze/pushanalyze.component';
+import { ExploretutorialsComponent } from './exploretutorials/exploretutorials.component';
+//import { TutorialdetailsResolver } from './tutorialdetails/tutorialdetails.resolver';
+import { StatisticsComponent } from './statistics/statistics.component';
+//import { StatisticsResolver } from './statistics/statistics.resolver';
 
 
 
@@ -29,7 +35,11 @@ import { ProfileComponent } from './profile/profile.component';
     ReposidebarComponent,
     CreatetutorialComponent,
     TutorialdetailsComponent,
-    ProfileComponent
+    ProfileComponent,
+    BranchanalyzeComponent,
+    PushanalyzeComponent,
+    ExploretutorialsComponent,
+    StatisticsComponent
   ],
   imports: [
     CommonModule,
@@ -57,6 +67,28 @@ import { ProfileComponent } from './profile/profile.component';
       },
       {
         path: 'tutorialdetails/:id', component: TutorialdetailsComponent,
+        //resolve: {
+        //  TutorialdetailsResolver
+        //},
+        children: []
+      },
+      {
+        path: 'branchanalyze/:id', component: BranchanalyzeComponent,
+        children: []
+      },
+      {
+        path: 'pushanalyze/:id', component: PushanalyzeComponent,
+        children: []
+      },
+      {
+        path: 'exploretutorials', component: ExploretutorialsComponent,
+        children: []
+      },
+      {
+        path: 'statistics', component: StatisticsComponent,
+        //resolve: {
+        //  StatisticsResolver
+        //},
         children: []
       },
     ]),
@@ -74,6 +106,7 @@ import { ProfileComponent } from './profile/profile.component';
     MatSelectModule,
     MatFormFieldModule,
     HttpClientModule
-  ]
+  ],
+  providers: [] //TutorialdetailsResolver, StatisticsResolver
 })
 export class RepoModule { }

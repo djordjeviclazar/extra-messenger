@@ -179,5 +179,65 @@ namespace ExtraMessenger.Controllers
                 .Return((name) => new { Name = name.As<string>() });
             return Ok(await query.ResultsAsync);
         }
+
+        [HttpGet("getrecommended")]
+        public async Task<IActionResult> GetRecommended()
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            DateTime dateTime = DateTime.UtcNow;
+            var beforeLimit = dateTime.AddDays(-14);
+            var beforeLimitString = beforeLimit.ToString("yyyy-MM-dd") + "T" + beforeLimit.ToString("HH:mm:ss.ff") + "Z";
+            var query = _neoContext.Cypher
+                .Match($"(u:User {{Id: '{currentUser}'}})-[:INTEREST]->(rec:Topic)<-[:ON_TOPIC]-(t:Tutorial)")
+                .Where($"(t.Time > datetime('{beforeLimitString}')) AND (NOT (u)-[:CREATED]->(t))")
+                .Match($"(c)-[:CREATED]->(t)")
+                .With($"c.Username AS username, c.Id as userId, t.Id as tutorialId, t.Title as title")
+                .Return((username, userId, tutorialId, title) => new 
+                {
+                    Username = username.As<string>(),
+                    UserId = userId.As<string>(),
+                    TutorialId = tutorialId.As<string>(),
+                    Title = title.As<string>()
+                });
+            var queryText = query.Query.DebugQueryText;
+
+
+            return Ok(await query.ResultsAsync);
+        }
+
+        [HttpGet("gethot")]
+        public async Task<IActionResult> GetHot()
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            return Ok();
+        }
+
+        [HttpGet("basicstats")]
+        public async Task<IActionResult> GetBasicStats()
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var query = _neoContext.Cypher
+                .Match("(l: Language)")
+                .OptionalMatch($"(l)<-[:WRITTEN_IN]-(r2:Repo)<-[:OWNS]-(u:User {{Id: '{currentUser}'}})")
+                .OptionalMatch($"(l)<-[:WRITTEN_IN]-(r:Repo)<-[:HAS_EXAMPLE]-(p:Part)<-[:HAS_PART]-(t:Tutorial)<-[:UPVOTED]-(u )")
+                .With($"count(r2) AS work, count(p) AS interest, l.Name AS language")
+                .Return((work, interest, language) => new
+                {
+                    Work = work.As<int>(),
+                    Interest = interest.As<int>(),
+                    Language = language.As<string>()
+                });
+            var queryText = query.Query.DebugQueryText;
+            var result = (await query.ResultsAsync).ToList();
+
+            var labels = result.Select(x => x.Language);
+            var tutorials = result.Select(x => x.Interest);
+            var repos = result.Select(x => x.Work);
+
+            return Ok(new { labels = labels, tutorialArray = tutorials, repoArray = repos });
+        }
     }
 }

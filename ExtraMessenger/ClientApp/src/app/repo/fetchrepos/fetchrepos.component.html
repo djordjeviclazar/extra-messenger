@@ -20,6 +20,8 @@
       </mat-card-content>
       <mat-card-actions>
         <button color="primary" mat-raised-button (click)="fetchRepoInfo(repo.id)">Fetch/Sync Issues</button>
+        <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Branches</button>
+        <button color="primary" mat-raised-button (click)="goToPushes(repo.id)">Analyze Pushes</button>
       </mat-card-actions>
     </mat-card>
   </div>
@@ -41,6 +43,7 @@
       </mat-card-content>
       <mat-card-actions>
         <button color="primary" mat-raised-button (click)="fetchRepoInfo(repo.id)">Fetch/Sync Issues</button>
+        <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Branches</button>
       </mat-card-actions>
     </mat-card>
   </div>

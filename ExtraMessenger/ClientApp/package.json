@@ -32,9 +32,11 @@
     "bootstrap": "^4.6.0",
     "core-js": "^3.8.3",
     "jquery": "^3.5.1",
+    "ng2-charts": "^2.4.2",
     "oidc-client": "^1.11.3",
     "popper.js": "^1.16.0",
     "rxjs": "^6.6.3",
+    "tc-angular-chartjs": "^2.1.4",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"
   },

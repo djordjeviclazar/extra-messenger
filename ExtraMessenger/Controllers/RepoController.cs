@@ -138,6 +138,38 @@ namespace ExtraMessenger.Controllers
             }));
         }
 
+        [HttpGet("getleaningbranches/{name}")]
+        public async Task<IActionResult> GetLeaningBranches(string name)
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            return Ok();
+        }
+
+        [HttpGet("getleaningbranches/{name}")]
+        public async Task<IActionResult> GetAffectedBranches(string name)
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            return Ok();
+        }
+
+        [HttpGet("getbranches/{repoId}")]
+        public async Task<IActionResult> GetBranches(long repoId)
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var query = _neoContext.Cypher
+                    .Match("(r:Repo {Id:" + repoId + "})-[rel:HAS_BRANCH]->(b:Branch)")
+                    .With("b.Name AS name")
+                    .Return((name) => new { Name = name.As<string>() })
+                    ;
+            var branchGet = query.Query.DebugQueryText;
+            var branches = await query.ResultsAsync;
+
+            return Ok(branches.ToList());
+        }
+
         [HttpGet("fetchrepoinfo/{repoId}")]
         public async Task<IActionResult> FetchRepoInfo(long repoId)
         {
@@ -247,7 +279,6 @@ namespace ExtraMessenger.Controllers
                             var queryPullRequestText = queryPullRequest.Query.DebugQueryText;
                             await queryPullRequest.ExecuteWithoutResultsAsync();
                         }
-
                         break;
                     default:
                         break;
