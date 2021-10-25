@@ -14,7 +14,7 @@ namespace ExtraMessenger.Data
 
         public string ReposCollectionName { get; set; }
 
-        public string TutorialsCollectionName { get; set; }
+        public string TicketsCollectionName { get; set; }
 
         public string OGitAuthCollectionName { get; set; }
 
@@ -32,7 +32,7 @@ namespace ExtraMessenger.Data
 
         public string ReposCollectionName { get; set; }
 
-        public string TutorialsCollectionName { get; set; }
+        public string TicketsCollectionName { get; set; }
 
         public string OGitAuthCollectionName { get; set; }
 

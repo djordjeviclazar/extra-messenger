@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace ExtraMessenger.Models
 {
-    public class Tutorial
+    public class Ticket
     {
         [Required]
         public ObjectId Id { get; set; }
         [Required]
         public string Title { get; set; }
-        public List<TutorialPart> Parts { get; set; }
+        public List<TicketPart> Parts { get; set; }
         public string Introduction { get; set; }
         public List<string> Topics { get; set; }
         public string Difficulty { get; set; }

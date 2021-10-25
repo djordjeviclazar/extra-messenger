@@ -15,7 +15,7 @@ import { map } from 'rxjs/operators';
 export class StatisticsComponent implements OnInit {
   labelArray: any[];
   repositoryArray: any[];
-  tutorialArray: any[];
+  TicketArray: any[];
 
   @ViewChild('barCanvas') private barCanvas: ElementRef;
   barChart: any;
@@ -26,7 +26,7 @@ export class StatisticsComponent implements OnInit {
     //this._activatedRoute.data.pipe(map(data => {
     //  debugger;
     //  this.repositoryArray = data.repoArray;
-    //  this.tutorialArray = data.tutorialArray;
+    //  this.TicketArray = data.TicketArray;
     //  this.labelArray = data.labels;
     //})).subscribe(x => {
     //  this.barChartMethod();
@@ -34,7 +34,7 @@ export class StatisticsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    let path = 'https://localhost:5001/api/tutorial/basicstats';
+    let path = 'https://localhost:5001/api/Ticket/basicstats';
     let response = this.http.get<any>(path, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -42,7 +42,7 @@ export class StatisticsComponent implements OnInit {
     });
     response.subscribe(x => {
       this.repositoryArray = x.repoArray;
-      this.tutorialArray = x.tutorialArray;
+      this.TicketArray = x.ticketArray;
       this.labelArray = x.labels;
 
       this.barChartMethod();
@@ -75,14 +75,14 @@ export class StatisticsComponent implements OnInit {
           borderWidth: 1
         },
         {
-          label: '# of Upvoted Tutorials',
-          data: this.tutorialArray,
+          label: '# of Upvoted Tickets',
+          data: this.TicketArray,
           backgroundColor: bckColorArray2,
           borderColor: borderColorArray2,
           borderWidth: 1
           },
         //  {
-        //    label: '# of Downvoted Tutorials',
+        //    label: '# of Downvoted Tickets',
         //    data: ,
         //    backgroundColor: bckColorArray,
         //    borderColor: borderColorArray,

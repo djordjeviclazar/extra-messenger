@@ -4,7 +4,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from '@angular/common/http';
 
 //@Injectable()
-export class TutorialdetailsResolver implements Resolve<any>{
+export class TicketdetailsResolver implements Resolve<any>{
 
   constructor(
     private http: HttpClient
@@ -13,7 +13,7 @@ export class TutorialdetailsResolver implements Resolve<any>{
   }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-    let path = 'https://localhost:5001/api/tutorial/gettutorial/' + route.params['id'];
+    let path = 'https://localhost:5001/api/ticket/getticket/' + route.params['id'];
     let response = this.http.get<any>(path, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,

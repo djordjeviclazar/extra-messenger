@@ -14,7 +14,7 @@ export class ProfileComponent implements OnInit {
   _othertopics: any[];
   _profile: any;
   _imageUrl: string;
-  _tutorials: any;
+  _Tickets: any;
 
   constructor(private router: HttpClient) { }
 
@@ -33,7 +33,7 @@ export class ProfileComponent implements OnInit {
       this._othertopics = x.otherTopics;
     });
 
-    this._tutorials = this.router.get<any[]>('https://localhost:5001/api/user/gettoptutorials', {
+    this._Tickets = this.router.get<any[]>('https://localhost:5001/api/user/gettopTickets', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }

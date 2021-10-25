@@ -5,11 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
-  selector: 'app-reporouter', //'app-createtutorial'
-  templateUrl: './createtutorial.component.html',
-  styleUrls: ['./createtutorial.component.css']
+  selector: 'app-reporouter', //'app-createTicket'
+  templateUrl: './createticket.component.html',
+  styleUrls: ['./createticket.component.css']
 })
-export class CreatetutorialComponent implements OnInit {
+export class CreateTicketComponent implements OnInit {
 
   isFilledRequired: boolean = false;
   title: string = '';
@@ -17,12 +17,12 @@ export class CreatetutorialComponent implements OnInit {
   selectedDifficulty: string = '';
   selectedTopic: string = '';
   selectedRepo: any = {};
-  difficulties: any = this.router.get<any[]>('https://localhost:5001/api/tutorial/getdifficulties', {
+  difficulties: any = this.router.get<any[]>('https://localhost:5001/api/Ticket/getdifficulties', {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
     }
   });
-  topics: any = this.router.get<any[]>('https://localhost:5001/api/tutorial/gettopics', {
+  topics: any = this.router.get<any[]>('https://localhost:5001/api/Ticket/gettopics', {
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
     }
@@ -54,36 +54,36 @@ export class CreatetutorialComponent implements OnInit {
     }
   }
 
-  createTutorial() {
-    let tutorialDto: any = {};
+  createTicket() {
+    let TicketDto: any = {};
     let part: any = {};
     let partList: any[] = [];
     let selectedTopics: string[] = [];
 
-    tutorialDto.Title = this.title;
-    tutorialDto.Introduction = this.intro;
-    tutorialDto.Difficulty = this.selectedDifficulty;
+    TicketDto.Title = this.title;
+    TicketDto.Introduction = this.intro;
+    TicketDto.Difficulty = this.selectedDifficulty;
 
     selectedTopics.push(this.selectedTopic);
-    tutorialDto.Topics = selectedTopics;
+    TicketDto.Topics = selectedTopics;
 
     part.Title = '';
     part.RepoId = this.selectedRepo.id;
     part.RepoUrl = this.selectedRepo.repoUrl;
     part.Description = '';
     partList.push(part);
-    tutorialDto.Parts = partList;
+    TicketDto.Parts = partList;
 
-    const path = 'https://localhost:5001/api/tutorial/create';
-    this.router.post<any>(path, tutorialDto, {
+    const path = 'https://localhost:5001/api/Ticket/create';
+    this.router.post<any>(path, TicketDto, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
     }).subscribe((response) => {
       if (response.success) {
-        this._alertifyService.success("Tutorial created");
-        const pathToTutorial = 'https://localhost:4200/repo/tutorialdetails/'; //https://localhost:4200/repo/tutorialdetails/
-        this._routeNavigator.navigate([pathToTutorial, response.id]);
+        this._alertifyService.success("Ticket created");
+        const pathToTicket = 'https://localhost:4200/repo/Ticketdetails/'; //https://localhost:4200/repo/Ticketdetails/
+        this._routeNavigator.navigate([pathToTicket, response.id]);
       }
       else {
         this._alertifyService.error("Error: " + response.message);

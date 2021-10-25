@@ -11,11 +11,11 @@ namespace ExtraMessenger.DTOs
         public string Username { get; set; }
         public List<string> LikedTopics { get; set; }
         public List<string> OtherTopics { get; set; }
-        public List<TutorialRes> TopTutorials { get; set; }
+        public List<TicketRes> TopTickets { get; set; }
         public int Rating { get; set; }
     }
 
-    public class TutorialRes
+    public class TicketRes
     {
         public string Id { get; set; }
         public string Title { get; set; }

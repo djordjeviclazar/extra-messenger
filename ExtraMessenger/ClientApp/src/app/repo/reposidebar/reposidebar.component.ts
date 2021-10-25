@@ -18,12 +18,12 @@ export class ReposidebarComponent implements OnInit {
     this._router.navigate(['repo/statistics']);
   }
 
-  navigateExloreTutorial() {
-    this._router.navigate(['repo/exploretutorials']);
+  navigateExloreTicket() {
+    this._router.navigate(['repo/exploretickets']);
   }
 
-  navigateCreateTutorial() {
-    this._router.navigate(['repo/createtutorial']);
+  navigateCreateTicket() {
+    this._router.navigate(['repo/createticket']);
   }
 
   navigateFetchRepos() {

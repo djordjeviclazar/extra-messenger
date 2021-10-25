@@ -4,13 +4,13 @@ import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-reporouter',
-  templateUrl: './tutorialdetails.component.html',
-  styleUrls: ['./tutorialdetails.component.css']
+  templateUrl: './ticketdetails.component.html',
+  styleUrls: ['./ticketdetails.component.css']
 })
-export class TutorialdetailsComponent implements OnInit {
+export class TicketdetailsComponent implements OnInit {
   id: string;
-  tutorial: any;
-  tutorialTopic: string;
+  Ticket: any;
+  TicketTopic: string;
 
   _isUp: boolean;
   _isDown: boolean;//votes
@@ -26,18 +26,18 @@ export class TutorialdetailsComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.params.subscribe((params: Params) => {
       this.id = params['id'];
-      let path = 'https://localhost:5001/api/tutorial/gettutorial/' + this.id;
+      let path = 'https://localhost:5001/api/ticket/getticket/' + this.id;
       let response = this.http.get<any>(path, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
         }
       });
       response.subscribe(x => {
-        this.tutorial = x;
-        this.tutorialTopic = x.topics[0];
+        this.Ticket = x;
+        this.TicketTopic = x.topics[0];
       });
 
-      let path2 = 'https://localhost:5001/api/tutorial/isvoted/' + this.id;
+      let path2 = 'https://localhost:5001/api/ticket/isvoted/' + this.id;
       let response2 = this.http.get<any>(path2, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -56,20 +56,20 @@ export class TutorialdetailsComponent implements OnInit {
     /*
     this.activatedRoute.data.subscribe((data) => {
       console.log(data);
-      this.tutorial = data;
+      this.Ticket = data;
     });*/
   }
 
   goToRepo() {
-    if (this.tutorial.parts[0].repoUrl != null) {
-      window.location.href = this.tutorial.parts[0].repoUrl;
+    if (this.Ticket.parts[0].repoUrl != null) {
+      window.location.href = this.Ticket.parts[0].repoUrl;
     }
   }
 
   upvote() {
     this._isUp = true;
-    this.tutorial.upvotes++;
-    let path = 'https://localhost:5001/api/tutorial/upvote/' + this.id;
+    this.Ticket.upvotes++;
+    let path = 'https://localhost:5001/api/ticket/upvote/' + this.id;
     let response = this.http.put<any>(path, null, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
@@ -82,8 +82,8 @@ export class TutorialdetailsComponent implements OnInit {
 
   downvote() {
     this._isDown = true;
-    this.tutorial.downvotes++;
-    let path = 'https://localhost:5001/api/tutorial/downvote/' + this.id;
+    this.Ticket.downvotes++;
+    let path = 'https://localhost:5001/api/ticket/downvote/' + this.id;
     let response = this.http.put<any>(path, null, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,

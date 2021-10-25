@@ -107,9 +107,9 @@ namespace ExtraMessenger.Controllers
             var user = (await userCollection.FindAsync<Models.User>(filterUser)).FirstOrDefault();
 
             var ratingQuery = _neoContext.Cypher
-                .OptionalMatch("(u:User {Id:'" + currentUser.ToString() + "'})-[rel:CREATED]->(t:Tutorial)<-[:UPVOTED]-(u2:User)")
+                .OptionalMatch("(u:User {Id:'" + currentUser.ToString() + "'})-[rel:CREATED]->(t:Ticket)<-[:UPVOTED]-(u2:User)")
                 .With("count(u2) AS ups")
-                .OptionalMatch("(u)-[rel2:CREATED]->(t:Tutorial)<-[:DOWNVOTED]-(u3:User)")
+                .OptionalMatch("(u)-[rel2:CREATED]->(t:Ticket)<-[:DOWNVOTED]-(u3:User)")
                 .With("ups - count(u3) AS res")
                 .Return<int>("res");
             var ratingQueryText = ratingQuery.Query.DebugQueryText;
@@ -147,15 +147,15 @@ namespace ExtraMessenger.Controllers
             return Ok(returnDTO);
         }
 
-        [HttpGet("gettoptutorials")]
-        public async Task<IActionResult> GetTopTutorials()
+        [HttpGet("gettopTickets")]
+        public async Task<IActionResult> GetTopTickets()
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            var tutorials = await _neoContext.Cypher
-                .Match("(u:User {Id:'" + currentUser.ToString() + "'})-[rel:CREATED]->(t:Tutorial)")
+            var Tickets = await _neoContext.Cypher
+                .Match("(u:User {Id:'" + currentUser.ToString() + "'})-[rel:CREATED]->(t:Ticket)")
                 .With("t.Id AS id, t.Title AS title, (size(()-[:UPVOTED]->(t))- size(()-[:DOWNVOTED]->(t))) AS rating")
-                .Return((id, title, rating) => new TutorialRes
+                .Return((id, title, rating) => new TicketRes
                 {
                     Id = id.As<string>(),
                     Title = title.As<string>(),
@@ -165,10 +165,10 @@ namespace ExtraMessenger.Controllers
                 .Limit(3)
                 .ResultsAsync;
 
-            return Ok(tutorials.ToList());
+            return Ok(Tickets.ToList());
         }
 
-        [HttpGet("addinterest/{name}")]
+        [HttpGet("  addinterest/{name}")]
         public async Task<IActionResult> AddInterest(string name)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);

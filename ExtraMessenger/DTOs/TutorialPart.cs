@@ -1,6 +1,6 @@
 ﻿namespace ExtraMessenger.DTOs
 {
-    public class TutorialPart
+    public class TicketPart
     {
         public string Title { get; set; }
         public long RepoId { get; set; }

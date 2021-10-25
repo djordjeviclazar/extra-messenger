@@ -1,7 +1,7 @@
 
 <div class="main-container">
   <app-reposidebar></app-reposidebar>
-  <button color="secondary" mat-raised-button (click)="fetchrepos()">Fetch</button>
+  <button style="height:60px" color="secondary" mat-raised-button (click)="fetchrepos()">Fetch</button>
   <div class="oldrepos">
     <mat-card *ngFor="let repo of (oldReposObservable | async) as repos" class="example-card">
       <mat-card-header>
@@ -19,9 +19,10 @@
         Open issues: {{repo.openIssues}}
       </mat-card-content>
       <mat-card-actions>
+        <!--
         <button color="primary" mat-raised-button (click)="fetchRepoInfo(repo.id)">Fetch/Sync Issues</button>
-        <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Branches</button>
-        <button color="primary" mat-raised-button (click)="goToPushes(repo.id)">Analyze Pushes</button>
+        <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Issues</button>
+        <button color="primary" mat-raised-button (click)="goToPushes(repo.id)">Analyze Pushes</button> -->
       </mat-card-actions>
     </mat-card>
   </div>
@@ -42,9 +43,10 @@
         Open issues: {{repo.openIssues}}
       </mat-card-content>
       <mat-card-actions>
-        <button color="primary" mat-raised-button (click)="fetchRepoInfo(repo.id)">Fetch/Sync Issues</button>
-        <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Branches</button>
-      </mat-card-actions>
-    </mat-card>
+        <!-->
+          <button color="primary" mat-raised-button (click)="fetchRepoInfo(repo.id)">Fetch/Sync Issues</button>
+          <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Branches</button> -->
+        </mat-card-actions>
+      </mat-card>
+    </div>
   </div>
-</div>

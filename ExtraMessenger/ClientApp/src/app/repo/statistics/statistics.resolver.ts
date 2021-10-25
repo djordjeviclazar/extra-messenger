@@ -15,7 +15,7 @@ export class StatisticsResolver implements Resolve<any>{
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
     debugger;
-    let path = 'https://localhost:5001/api/tutorial/basicstats';
+    let path = 'https://localhost:5001/api/Ticket/basicstats';
     let response = this.http.get<any>(path, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,

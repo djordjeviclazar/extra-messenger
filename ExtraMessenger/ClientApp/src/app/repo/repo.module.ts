@@ -16,13 +16,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { FetchreposComponent } from './fetchrepos/fetchrepos.component';
 import { ReporouterComponent } from './reporouter.component';
 import { ReposidebarComponent } from './reposidebar/reposidebar.component';
-import { CreatetutorialComponent } from './createtutorial/createtutorial.component';
-import { TutorialdetailsComponent } from './tutorialdetails/tutorialdetails.component';
+import { CreateTicketComponent } from './createtickets/createticket.component';
+import { TicketdetailsComponent } from './ticketdetails/ticketdetails.component';
 import { ProfileComponent } from './profile/profile.component';
 import { BranchanalyzeComponent } from './branchanalyze/branchanalyze.component';
 import { PushanalyzeComponent } from './pushanalyze/pushanalyze.component';
-import { ExploretutorialsComponent } from './exploretutorials/exploretutorials.component';
-//import { TutorialdetailsResolver } from './tutorialdetails/tutorialdetails.resolver';
+import { ExploreTicketsComponent } from './exploretickets/exploretickets.component';
+//import { TicketdetailsResolver } from './Ticketdetails/Ticketdetails.resolver';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.component';
 //import { StatisticsResolver } from './statistics/statistics.resolver';
@@ -34,12 +34,12 @@ import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.comp
     ReporouterComponent,
     FetchreposComponent,
     ReposidebarComponent,
-    CreatetutorialComponent,
-    TutorialdetailsComponent,
+    CreateTicketComponent,
+    TicketdetailsComponent,
     ProfileComponent,
     BranchanalyzeComponent,
     PushanalyzeComponent,
-    ExploretutorialsComponent,
+    ExploreTicketsComponent,
     StatisticsComponent,
     IssuestatisticsComponent
   ],
@@ -52,7 +52,7 @@ import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.comp
         children: [
           //{ path: '', component: FetchreposComponent, pathMatch: 'prefix' },
           //{ path: 'fetchrepo', component: FetchreposComponent, pathMatch: 'full' },
-          //{ path: 'createtutorial', component: CreatetutorialComponent, pathMatch: 'full' }
+          //{ path: 'createTicket', component: CreateTicketComponent, pathMatch: 'full' }
         ]
       },
       {
@@ -60,7 +60,7 @@ import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.comp
         children: []
       },
       {
-        path: 'createtutorial', component: CreatetutorialComponent,
+        path: 'createticket', component: CreateTicketComponent,
         children: []
       },
       {
@@ -68,9 +68,9 @@ import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.comp
         children: []
       },
       {
-        path: 'tutorialdetails/:id', component: TutorialdetailsComponent,
+        path: 'ticketdetails/:id', component: TicketdetailsComponent,
         //resolve: {
-        //  TutorialdetailsResolver
+        //  TicketdetailsResolver
         //},
         children: []
       },
@@ -83,7 +83,7 @@ import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.comp
         children: []
       },
       {
-        path: 'exploretutorials', component: ExploretutorialsComponent,
+        path: 'exploretickets', component: ExploreTicketsComponent,
         children: []
       },
       {
@@ -113,6 +113,6 @@ import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.comp
     MatFormFieldModule,
     HttpClientModule
   ],
-  providers: [] //TutorialdetailsResolver, StatisticsResolver
+  providers: [] //TicketdetailsResolver, StatisticsResolver
 })
 export class RepoModule { }

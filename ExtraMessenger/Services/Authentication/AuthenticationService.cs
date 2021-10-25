@@ -78,7 +78,8 @@ namespace ExtraMessenger.Services.Authentication
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 Username = username,
-                Id = ObjectId.GenerateNewId()
+                Id = ObjectId.GenerateNewId(),
+                Repositories = new List<Octokit.Repository>()
             };
             /*
             var query = _graphClient.Cypher.Merge("(n:User {Username:'" + username + "', Id:'" + registeredUser.Id.ToString() + "})")

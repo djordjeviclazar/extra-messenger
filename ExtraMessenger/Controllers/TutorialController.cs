@@ -15,12 +15,12 @@ namespace ExtraMessenger.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TutorialController : ControllerBase
+    public class TicketController : ControllerBase
     {
         private readonly IGraphClient _neoContext;
         private readonly MongoService _mongoService;
 
-        public TutorialController(IGraphClient graphClient,
+        public TicketController(IGraphClient graphClient,
             MongoService mongoService)
         {
             _neoContext = graphClient;
@@ -28,7 +28,7 @@ namespace ExtraMessenger.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create(TutorialDTO tutorialDTO)
+        public async Task<IActionResult> Create(TicketDTO TicketDTO)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
@@ -38,68 +38,68 @@ namespace ExtraMessenger.Controllers
             var filterUser = Builders<Models.User>.Filter.Eq(u => u.Id, currentUser);
             var user = (await userCollection.FindAsync<Models.User>(filterUser)).FirstOrDefault();
 
-            var tutorial = new Tutorial
+            var Ticket = new Ticket
             {
                 Id = ObjectId.GenerateNewId(),
-                Title = tutorialDTO.Title,
-                Parts = tutorialDTO.Parts,
-                Introduction = tutorialDTO.Introduction,
-                Topics = tutorialDTO.Topics,
-                Difficulty = tutorialDTO.Difficulty,
+                Title = TicketDTO.Title,
+                Parts = TicketDTO.Parts,
+                Introduction = TicketDTO.Introduction,
+                Topics = TicketDTO.Topics,
+                Difficulty = TicketDTO.Difficulty,
                 Owner = user.Username
             };
 
-            var tutorialsCollection = mongoDb.GetCollection<Models.Tutorial>(mongoSettings.TutorialsCollectionName);
-            await tutorialsCollection.InsertOneAsync(tutorial);
+            var TicketsCollection = mongoDb.GetCollection<Models.Ticket>(mongoSettings.TicketsCollectionName);
+            await TicketsCollection.InsertOneAsync(Ticket);
 
             var createQuery = _neoContext.Cypher
                 .Match("(u:User {Id:'" + currentUser.ToString() + "'})")
-                .Match("(d:Difficulty {Name:'" + tutorial.Difficulty + "'})")
-                .Unwind(tutorial.Topics, "topicsArray")
+                .Match("(d:Difficulty {Name:'" + Ticket.Difficulty + "'})")
+                .Unwind(Ticket.Topics, "topicsArray")
                 .Match("(topic:Topic {Name: coalesce(topicsArray, 'N/A')})")
-                .Create("(t:Tutorial {Id: '"+ tutorial.Id.ToString() +"' ,Title:'" + tutorial.Title + "', Time:datetime()})")
+                .Create("(t:Ticket {Id: '"+ Ticket.Id.ToString() +"' ,Title:'" + Ticket.Title + "', Time:datetime()})")
                 .Merge("(u)-[r1:CREATED]->(t)")
                 .Merge("(topic)<-[r2:ON_TOPIC]-(t)")
                 .Merge("(d)<-[r3:HAS_DIFFICULTY]-(t)")
                 .With("t")
-                .Unwind(tutorial.Parts, "part")
+                .Unwind(Ticket.Parts, "part")
                 .Match("(r:Repo {Id:part.RepoId})")
                 .Merge("(p:Part {Title:part.Title, RepoId:part.RepoId, RepoUrl:part.RepoUrl})-[r4:HAS_EXAMPLE]->(r)")
                 .Merge("(t)-[r5:HAS_PART]->(p)");
             var createQueryText = createQuery.Query.DebugQueryText;
             await createQuery.ExecuteWithoutResultsAsync();
 
-            return Ok(new { Success = true, Id = tutorial.Id.ToString() });
+            return Ok(new { Success = true, Id = Ticket.Id.ToString() });
         }
 
-        [HttpGet("gettutorial/{tutorialid}")]
-        public async Task<IActionResult> GetTutorial(string tutorialId)
+        [HttpGet("getTicket/{Ticketid}")]
+        public async Task<IActionResult> GetTicket(string TicketId)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var mongoDb = _mongoService.GetDb;
             var mongoSettings = _mongoService.GetDBSettings;
-            var tutorialCollection = mongoDb.GetCollection<Models.Tutorial>(mongoSettings.TutorialsCollectionName);
-            var filter = Builders<Models.Tutorial>.Filter.Eq(t => t.Id, ObjectId.Parse(tutorialId));
-            var tutorial = (await tutorialCollection.FindAsync<Models.Tutorial>(filter)).FirstOrDefault();
+            var TicketCollection = mongoDb.GetCollection<Models.Ticket>(mongoSettings.TicketsCollectionName);
+            var filter = Builders<Models.Ticket>.Filter.Eq(t => t.Id, ObjectId.Parse(TicketId));
+            var Ticket = (await TicketCollection.FindAsync<Models.Ticket>(filter)).FirstOrDefault();
 
-            return Ok(tutorial);
+            return Ok(Ticket);
         }
 
-        [HttpPut("upvote/{tutorialId}")]
-        public async Task<IActionResult> Upvote(string tutorialId)
+        [HttpPut("upvote/{TicketId}")]
+        public async Task<IActionResult> Upvote(string TicketId)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var mongoDb = _mongoService.GetDb;
             var mongoSettings = _mongoService.GetDBSettings;
-            var tutorialCollection = mongoDb.GetCollection<Models.Tutorial>(mongoSettings.TutorialsCollectionName);
-            var filter = Builders<Models.Tutorial>.Filter.Eq(t => t.Id, ObjectId.Parse(tutorialId));
-            var inc = Builders<Models.Tutorial>.Update.Inc(x => x.Upvotes, 1);
-            await tutorialCollection.UpdateOneAsync(filter, inc);
+            var TicketCollection = mongoDb.GetCollection<Models.Ticket>(mongoSettings.TicketsCollectionName);
+            var filter = Builders<Models.Ticket>.Filter.Eq(t => t.Id, ObjectId.Parse(TicketId));
+            var inc = Builders<Models.Ticket>.Update.Inc(x => x.Upvotes, 1);
+            await TicketCollection.UpdateOneAsync(filter, inc);
 
             var query = _neoContext.Cypher
-                .Match("(t:Tutorial {Id:'" + tutorialId + "'})")
+                .Match("(t:Ticket {Id:'" + TicketId + "'})")
                 .Match("(u:User {Id:'" + currentUser.ToString() + "'})")
                 .Merge("(u)-[r:UPVOTED {Time: datetime()}]->(t)");
             var queryText = query.Query.DebugQueryText;
@@ -108,20 +108,20 @@ namespace ExtraMessenger.Controllers
             return Ok();
         }
 
-        [HttpPut("downvote/{tutorialId}")]
-        public async Task<IActionResult> Downvote(string tutorialId)
+        [HttpPut("downvote/{TicketId}")]
+        public async Task<IActionResult> Downvote(string TicketId)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var mongoDb = _mongoService.GetDb;
             var mongoSettings = _mongoService.GetDBSettings;
-            var tutorialCollection = mongoDb.GetCollection<Models.Tutorial>(mongoSettings.TutorialsCollectionName);
-            var filter = Builders<Models.Tutorial>.Filter.Eq(t => t.Id, ObjectId.Parse(tutorialId));
-            var inc = Builders<Models.Tutorial>.Update.Inc(x => x.Downvotes, 1);
-            await tutorialCollection.UpdateOneAsync(filter, inc);
+            var TicketCollection = mongoDb.GetCollection<Models.Ticket>(mongoSettings.TicketsCollectionName);
+            var filter = Builders<Models.Ticket>.Filter.Eq(t => t.Id, ObjectId.Parse(TicketId));
+            var inc = Builders<Models.Ticket>.Update.Inc(x => x.Downvotes, 1);
+            await TicketCollection.UpdateOneAsync(filter, inc);
 
             var query = _neoContext.Cypher
-                .Match("(t:Tutorial {Id:'" + tutorialId + "'})")
+                .Match("(t:Ticket {Id:'" + TicketId + "'})")
                 .Match("u:User {Id:'" + currentUser.ToString() + "'})")
                 .Merge("(u)-[r:DOWNVOTED {Time: datetime()}]->(t)");
             var queryText = query.Query.DebugQueryText;
@@ -130,13 +130,13 @@ namespace ExtraMessenger.Controllers
             return Ok();
         }
 
-        [HttpGet("isvoted/{tutorialid}")]
-        public async Task<IActionResult> IsVoted(string tutorialId)
+        [HttpGet("isvoted/{Ticketid}")]
+        public async Task<IActionResult> IsVoted(string TicketId)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var query = _neoContext.Cypher
-                .Match("(t:Tutorial {Id:'" + tutorialId + "'})")
+                .Match("(t:Ticket {Id:'" + TicketId + "'})")
                 .OptionalMatch("(u:User {Id:'" + currentUser.ToString() + "'})-[up:UPVOTED]->(t)")
                 .OptionalMatch("(u)-[down:DOWNVOTED]->(t)")
                 .With("(count(up) > 0) as ups, (count(down) > 0) as downs")
@@ -195,15 +195,15 @@ namespace ExtraMessenger.Controllers
             var beforeLimit = dateTime.AddDays(-14);
             var beforeLimitString = beforeLimit.ToString("yyyy-MM-dd") + "T" + beforeLimit.ToString("HH:mm:ss.ff") + "Z";
             var query = _neoContext.Cypher
-                .Match($"(u:User {{Id: '{currentUser}'}})-[:INTEREST]->(rec:Topic)<-[:ON_TOPIC]-(t:Tutorial)")
+                .Match($"(u:User {{Id: '{currentUser}'}})-[:INTEREST]->(rec:Topic)<-[:ON_TOPIC]-(t:Ticket)")
                 .Where($"(t.Time > datetime('{beforeLimitString}')) AND (NOT (u)-[:CREATED]->(t))")
                 .Match($"(c)-[:CREATED]->(t)")
-                .With($"c.Username AS username, c.Id as userId, t.Id as tutorialId, t.Title as title")
-                .Return((username, userId, tutorialId, title) => new 
+                .With($"c.Username AS username, c.Id as userId, t.Id as TicketId, t.Title as title")
+                .Return((username, userId, TicketId, title) => new 
                 {
                     Username = username.As<string>(),
                     UserId = userId.As<string>(),
-                    TutorialId = tutorialId.As<string>(),
+                    TicketId = TicketId.As<string>(),
                     Title = title.As<string>()
                 })
                 .Limit(10);
@@ -222,19 +222,19 @@ namespace ExtraMessenger.Controllers
             var beforeLimit = dateTime.AddDays(-5);
             var beforeLimitString = beforeLimit.ToString("yyyy-MM-dd") + "T" + beforeLimit.ToString("HH:mm:ss.ff") + "Z";
             var query = _neoContext.Cypher
-                .Match($"(u:User)-[up:UPVOTED]->(t:Tutorial)")
+                .Match($"(u:User)-[up:UPVOTED]->(t:Ticket)")
                 .Where($"(up.Time > datetime('{beforeLimitString}')) AND (NOT (u)-[:CREATED]->(t))")
                 .Match($"(c)-[:CREATED]->(t)")
                 .With($"count(up) as ups, c.Username AS username, c.Id as userId, t")
                 .OptionalMatch($"(u2:User)-[down:DOWNVOTED]->(t)")
-                .With($"ups, (ups * 10 - coalesce(count(down),0) * 2) as rating, username, userId, t.Id as tutorialId, t.Title as title")
+                .With($"ups, (ups * 10 - coalesce(count(down),0) * 2) as rating, username, userId, t.Id as TicketId, t.Title as title")
                 .Where("rating >= 0")
-                .Return((username, rating, userId, tutorialId, title) => new
+                .Return((username, rating, userId, TicketId, title) => new
                 {
                     Username = username.As<string>(),
                     Rating = rating.As<int>(),
                     UserId = userId.As<string>(),
-                    TutorialId = tutorialId.As<string>(),
+                    TicketId = TicketId.As<string>(),
                     Title = title.As<string>()
                 })
                 .OrderByDescending("rating", "ups")
@@ -252,7 +252,7 @@ namespace ExtraMessenger.Controllers
             var query = _neoContext.Cypher
                 .Match("(l: Language)")
                 .OptionalMatch($"(l)<-[:WRITTEN_IN]-(r2:Repo)<-[:OWNS]-(u:User {{Id: '{currentUser}'}})")
-                .OptionalMatch($"(l)<-[:WRITTEN_IN]-(r:Repo)<-[:HAS_EXAMPLE]-(p:Part)<-[:HAS_PART]-(t:Tutorial)<-[:UPVOTED]-(u )")
+                .OptionalMatch($"(l)<-[:WRITTEN_IN]-(r:Repo)<-[:HAS_EXAMPLE]-(p:Part)<-[:HAS_PART]-(t:Ticket)<-[:UPVOTED]-(u )")
                 .With($"count(r2) AS work, count(p) AS interest, l.Name AS language")
                 .Return((work, interest, language) => new
                 {
@@ -264,10 +264,10 @@ namespace ExtraMessenger.Controllers
             var result = (await query.ResultsAsync).ToList();
 
             var labels = result.Select(x => x.Language);
-            var tutorials = result.Select(x => x.Interest);
+            var Tickets = result.Select(x => x.Interest);
             var repos = result.Select(x => x.Work);
 
-            return Ok(new { labels = labels, tutorialArray = tutorials, repoArray = repos });
+            return Ok(new { labels = labels, TicketArray = Tickets, repoArray = repos });
         }
     }
 }

@@ -11,7 +11,7 @@ var StatisticsResolver = /** @class */ (function () {
     }
     StatisticsResolver.prototype.resolve = function (route, state) {
         debugger;
-        var path = 'https://localhost:5001/api/tutorial/basicstats';
+        var path = 'https://localhost:5001/api/Ticket/basicstats';
         var response = this.http.get(path, {
             headers: {
                 'Authorization': "Bearer " + localStorage.getItem('authToken'),

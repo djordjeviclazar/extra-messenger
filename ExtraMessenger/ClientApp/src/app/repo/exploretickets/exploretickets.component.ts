@@ -3,33 +3,34 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-exploretutorials',
-  templateUrl: './exploretutorials.component.html',
-  styleUrls: ['./exploretutorials.component.css']
+  selector: 'app-exploreTickets',
+  templateUrl: './exploretickets.component.html',
+  styleUrls: ['./exploretickets.component.css']
 })
-export class ExploretutorialsComponent implements OnInit {
+export class ExploreTicketsComponent implements OnInit {
 
-  _tutorialsObserver: any;
-  _hotTutorialsObserver: any;
+  _TicketsObserver: any;
+  _hotTicketsObserver: any;
 
   constructor(private http: HttpClient, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this._tutorialsObserver = this.http.get<any[]>('https://localhost:5001/api/tutorial/getrecommended', {
+    this._TicketsObserver = this.http.get<any[]>('https://localhost:5001/api/Ticket/getrecommended', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
     });
 
-    this._hotTutorialsObserver = this.http.get<any[]>('https://localhost:5001/api/tutorial/gethot', {
+    this._hotTicketsObserver = this.http.get<any[]>('https://localhost:5001/api/Ticket/gethot', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
     });
   }
 
-  goToTutorial(tutorialId: any) {
-    this.router.navigate(['../tutorialdetails', tutorialId], { relativeTo: this.activatedRoute });
+  goToTicket(TicketId: any) {
+    debugger;
+    this.router.navigate(['../ticketdetails', TicketId], { relativeTo: this.activatedRoute });
   }
 
   filterBeginner() {

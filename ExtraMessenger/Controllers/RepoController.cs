@@ -204,9 +204,10 @@ namespace ExtraMessenger.Controllers
                     var createdString = dateTime.ToString("yyyy-MM-dd") + "T" + dateTime.ToString("HH:mm:ss.ff") + "Z";
                     var query = _neoContext.Cypher
                     .Merge($"(i:Issue {{Id: {issue.Id}}})")
-                    .OnCreate().Set($"i.Number = {issue.Number}, i.Id = {issue.Id}), i.State = '{issueState}'")
+                    .OnCreate().Set($"i.Number = {issue.Number}, i.Id = {issue.Id}, i.State = '{issueState}'")
                     .OnMatch().Set($"i.State = '{issueState}'")
-                    .Merge($"(r:Repo {{ Id: {repoId} }})-[w:CREATED_ISSUE {{Time: datetime('{createdString}')}}]->(i)");
+                    .Match($"(r: Repo {{ Id: { repoId}  }} )")
+                    .Merge($"(r)-[w:CREATED_ISSUE {{Time: datetime('{createdString}')}}]->(i)");
                     var queryText = query.Query.DebugQueryText;
                     await query.ExecuteWithoutResultsAsync();
 
@@ -224,7 +225,7 @@ namespace ExtraMessenger.Controllers
                                 var commitId = iEvent["commit_id"].ToString();
                                 var eventQuery = _neoContext.Cypher
                                     .Match($"(c:CommitPush {{Sha: '{id}'}})")
-                                    .Match($"i:Issue {{Id: {issue.Id}}}")
+                                    .Match($"(i:Issue {{Id: {issue.Id}}})")
                                     .Merge($"(i)-[:REFERENCED]->(c)");
                                 var eventQueryText = eventQuery.Query.DebugQueryText;
                                 await eventQuery.ExecuteWithoutResultsAsync();
@@ -356,6 +357,7 @@ namespace ExtraMessenger.Controllers
                         break;
                 }
             }
+            await FetchIssues(repoId);
             return Ok();
         }
     }

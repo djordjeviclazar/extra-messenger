@@ -28,7 +28,7 @@
     <div class="row">
       <mat-form-field color="accent" >
         <mat-label>Introduction</mat-label>
-        <textarea matNativeControl placeholder="Write something about your tutorial" [(ngModel)]="intro">
+        <textarea matNativeControl placeholder="Write something about your Ticket" [(ngModel)]="intro">
         </textarea>
       </mat-form-field>
     </div>
@@ -44,7 +44,7 @@
     <div class="text-center strong">
       <div class="row">
         <button color="accent" class="btn btn-outline-success strong" [disabled]="!isFilledRequired"
-                (click)="createTutorial()">
+                (click)="createTicket()">
           Create
         </button>
       </div>

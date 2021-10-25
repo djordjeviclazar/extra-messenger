@@ -35,7 +35,7 @@
     <h2 class="text-orange">Recomended</h2>
     <mat-divider></mat-divider>
     <div style="overflow-y: scroll; overflow-x: hidden;">
-      <ng-container *ngFor="let t of (_tutorialsObserver | async) as tutorials">
+      <ng-container *ngFor="let t of (_TicketsObserver | async) as Tickets">
 
         <mat-card class="example-card">
           <mat-card-header>
@@ -54,7 +54,7 @@
           </div>
 
           <mat-card-actions>
-            <button color="primary" mat-raised-button (click)="goToTutorial(t.tutorialId)">Go To Tutorial</button>
+            <button color="primary" mat-raised-button (click)="goToTicket(t.ticketId)">Go To Ticket</button>
           </mat-card-actions>
         </mat-card>
       </ng-container>
@@ -66,8 +66,8 @@
     <h2 class="text-orange">Hot</h2>
     <mat-divider></mat-divider>
     <div style="overflow-y: scroll; overflow-x: hidden;">
-      <ng-container *ngFor="let h of (_hotTutorialsObserver | async) as hotTutorials">
-        <div (click)="goToTutorial(h.tutorialId)"
+      <ng-container *ngFor="let h of (_hotTicketsObserver | async) as hotTickets">
+        <div (click)="goToTicket(h.ticketId)"
              class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
           <div class="ml-2 mt-3 text-purple">
             <strong> {{h.title | titlecase}} </strong>

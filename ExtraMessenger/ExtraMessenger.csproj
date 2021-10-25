@@ -28,14 +28,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="ClientApp\src\app\repo\statistics\statistics.resolver.ts" />
-    <None Remove="ClientApp\src\app\repo\tutorialdetails\tutorialdetails.resolver.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ClientApp\src\assets\images\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\src\app\repo\statistics\statistics.resolver.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\repo\tutorialdetails\tutorialdetails.resolver.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\repo\ticketdetails\ticketdetails.resolver.ts" />
   </ItemGroup>
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <Exec Command="node --version" ContinueOnError="true">
