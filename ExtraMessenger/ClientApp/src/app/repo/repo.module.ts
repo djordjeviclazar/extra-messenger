@@ -24,6 +24,7 @@ import { PushanalyzeComponent } from './pushanalyze/pushanalyze.component';
 import { ExploretutorialsComponent } from './exploretutorials/exploretutorials.component';
 //import { TutorialdetailsResolver } from './tutorialdetails/tutorialdetails.resolver';
 import { StatisticsComponent } from './statistics/statistics.component';
+import { IssuestatisticsComponent } from './issuestatistics/issuestatistics.component';
 //import { StatisticsResolver } from './statistics/statistics.resolver';
 
 
@@ -39,7 +40,8 @@ import { StatisticsComponent } from './statistics/statistics.component';
     BranchanalyzeComponent,
     PushanalyzeComponent,
     ExploretutorialsComponent,
-    StatisticsComponent
+    StatisticsComponent,
+    IssuestatisticsComponent
   ],
   imports: [
     CommonModule,
@@ -89,6 +91,10 @@ import { StatisticsComponent } from './statistics/statistics.component';
         //resolve: {
         //  StatisticsResolver
         //},
+        children: []
+      },
+      {
+        path: 'issuestats/:id', component: IssuestatisticsComponent,
         children: []
       },
     ]),

@@ -7,6 +7,7 @@ namespace ExtraMessenger.Data
 {
     public class MongoDBSettings: IMongoDBSettings
     {
+        public string IssuesCollectionName { get; set; }
         public string UserCollectionName { get; set; }
 
         public string ChatColletionName { get; set; }
@@ -24,6 +25,7 @@ namespace ExtraMessenger.Data
 
     public interface IMongoDBSettings
     {
+        public string IssuesCollectionName { get; set; }
         string UserCollectionName { get; set; }
 
         string ChatColletionName { get; set; }

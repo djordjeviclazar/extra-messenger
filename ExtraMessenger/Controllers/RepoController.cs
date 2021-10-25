@@ -18,7 +18,7 @@ namespace ExtraMessenger.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RepoController: ControllerBase
+    public class RepoController : ControllerBase
     {
         private readonly IGraphClient _neoContext;
         private readonly MongoService _mongoService;
@@ -47,7 +47,7 @@ namespace ExtraMessenger.Controllers
             var user = (await userCollection.FindAsync<Models.User>(filterUser)).FirstOrDefault();
             //Fetch:
             List<Repository> resultList = new List<Repository>();
-            
+
             if (user.LastFetchedRepo != null)
             {
                 SearchRepositoriesRequest request;
@@ -83,7 +83,7 @@ namespace ExtraMessenger.Controllers
                 await userCollection.UpdateOneAsync(filterUser, updateUser); // update date
                 var updateUserRepositories = Builders<Models.User>.Update.PushEach<Repository>(u => u.Repositories, resultList);
                 await userCollection.UpdateManyAsync(filterUser, updateUserRepositories); // update Repository list of user
-                
+
                 // store in Neo4J
                 var query = _neoContext.Cypher
                     .Unwind(resultList, "repo")
@@ -118,7 +118,7 @@ namespace ExtraMessenger.Controllers
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var client = _githubClientService.GetGitHubClient(currentUser);
 
-            
+
             var mongoDb = _mongoService.GetDb;
             var mongoSettings = _mongoService.GetDBSettings;
             var userCollection = mongoDb.GetCollection<Models.User>(mongoSettings.UserCollectionName);
@@ -168,6 +168,78 @@ namespace ExtraMessenger.Controllers
             var branches = await query.ResultsAsync;
 
             return Ok(branches.ToList());
+        }
+
+        [HttpPut("fetchissues /{repoId}")]
+        public async Task<IActionResult> FetchIssues(long repoId)
+        {
+            ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var client = _githubClientService.GetGitHubClient(currentUser);
+
+            var mongoDb = _mongoService.GetDb;
+            var mongoSettings = _mongoService.GetDBSettings;
+            var repoCollection = mongoDb.GetCollection<Repository>(mongoSettings.ReposCollectionName);
+            var filterRepo = Builders<Repository>.Filter.Eq(r => r.Id, repoId);
+            var repo = (await repoCollection.FindAsync<Repository>(filterRepo)).FirstOrDefault();
+            var userCollection = mongoDb.GetCollection<Models.User>(mongoSettings.UserCollectionName);
+            var filterUser = Builders<Models.User>.Filter.Eq(u => u.Id, currentUser);
+            var user = (await userCollection.FindAsync<Models.User>(filterUser)).FirstOrDefault();
+
+            var issues = await _githubClientService.GetIssues(currentUser, user.GithubLogin, repo.Name);
+
+            DateTime utcNow = DateTime.UtcNow;
+            if (issues.Count > 0)
+            {
+                // store in Mongo
+                var issuesCollection = mongoDb.GetCollection<Issue>(mongoSettings.IssuesCollectionName);
+                var updates = new List<WriteModel<Issue>>();
+                foreach (var issue in issues)
+                {
+                    var filterIssue = Builders<Issue>.Filter.Eq(x => x.Id, issue.Id);
+                    updates.Add(new ReplaceOneModel<Issue>(filterIssue, issue) { IsUpsert = true });
+
+                    // store in Neo4J:
+                    var issueState = issue.State == "open" ? "Open" : issue.State == "closed" ? "Closed" : "Reopen";
+                    DateTime dateTime = issue.CreatedAt.UtcDateTime;
+                    var createdString = dateTime.ToString("yyyy-MM-dd") + "T" + dateTime.ToString("HH:mm:ss.ff") + "Z";
+                    var query = _neoContext.Cypher
+                    .Merge($"(i:Issue {{Id: {issue.Id}}})")
+                    .OnCreate().Set($"i.Number = {issue.Number}, i.Id = {issue.Id}), i.State = '{issueState}'")
+                    .OnMatch().Set($"i.State = '{issueState}'")
+                    .Merge($"(r:Repo {{ Id: {repoId} }})-[w:CREATED_ISSUE {{Time: datetime('{createdString}')}}]->(i)");
+                    var queryText = query.Query.DebugQueryText;
+                    await query.ExecuteWithoutResultsAsync();
+
+                    // add references:
+                    var issueEvents = await _githubClientService.GetIssueEvents(user.GithubLogin, repo.Name, user.OAuthToken, issue.Number + "");
+                    foreach (var iEvent in issueEvents)
+                    {
+                        var id = ((JValue)iEvent["id"]).ToString();
+                        var eventType = ((JValue)iEvent["event"]).ToString();
+                        var created = iEvent.Value<DateTime>("created_at");
+                        var createdEventString = created.ToString("yyyy-MM-dd") + "T" + created.ToString("HH:mm:ss") + "Z";
+                        switch (eventType)
+                        {
+                            case "referenced":
+                                var commitId = iEvent["commit_id"].ToString();
+                                var eventQuery = _neoContext.Cypher
+                                    .Match($"(c:CommitPush {{Sha: '{id}'}})")
+                                    .Match($"i:Issue {{Id: {issue.Id}}}")
+                                    .Merge($"(i)-[:REFERENCED]->(c)");
+                                var eventQueryText = eventQuery.Query.DebugQueryText;
+                                await eventQuery.ExecuteWithoutResultsAsync();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                await issuesCollection.BulkWriteAsync(updates, new BulkWriteOptions { IsOrdered = false });
+
+                // store in Neo4J
+                
+            }
+            return Ok();
         }
 
         [HttpGet("fetchrepoinfo/{repoId}")]

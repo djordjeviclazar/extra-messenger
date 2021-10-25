@@ -16,5 +16,7 @@ namespace ExtraMessenger.Services.Github.Interfaces
         public Task<List<Issue>> GetMyOpenIssues(ObjectId id);
         public Task<List<Branch>> GetBranches(ObjectId id, Repository repo);
         public Task<JArray> GetRepoEvents(string owner, string repoName, string token);
+        public Task<IReadOnlyList<Issue>> GetIssues(ObjectId id, string username, string repo);
+        public Task<JArray> GetIssueEvents(string owner, string repoName, string token, string issueNumber);
     }
 }

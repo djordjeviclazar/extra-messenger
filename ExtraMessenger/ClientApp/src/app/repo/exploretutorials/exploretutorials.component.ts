@@ -29,7 +29,6 @@ export class ExploretutorialsComponent implements OnInit {
   }
 
   goToTutorial(tutorialId: any) {
-    debugger;
     this.router.navigate(['../tutorialdetails', tutorialId], { relativeTo: this.activatedRoute });
   }
 

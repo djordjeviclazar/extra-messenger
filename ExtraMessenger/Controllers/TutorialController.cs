@@ -86,7 +86,7 @@ namespace ExtraMessenger.Controllers
             return Ok(tutorial);
         }
 
-        [HttpPut("upvote/{tutorialid}")]
+        [HttpPut("upvote/{tutorialId}")]
         public async Task<IActionResult> Upvote(string tutorialId)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -100,15 +100,15 @@ namespace ExtraMessenger.Controllers
 
             var query = _neoContext.Cypher
                 .Match("(t:Tutorial {Id:'" + tutorialId + "'})")
-                .Match("(t:User {Id:'" + currentUser.ToString() + "'})")
-                .Merge("(t)-[r:UPVOTED {Time: datetime()}]->(t)");
+                .Match("(u:User {Id:'" + currentUser.ToString() + "'})")
+                .Merge("(u)-[r:UPVOTED {Time: datetime()}]->(t)");
             var queryText = query.Query.DebugQueryText;
             await query.ExecuteWithoutResultsAsync();
 
             return Ok();
         }
 
-        [HttpPut("downvote/{tutorialid}")]
+        [HttpPut("downvote/{tutorialId}")]
         public async Task<IActionResult> Downvote(string tutorialId)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
@@ -122,23 +122,29 @@ namespace ExtraMessenger.Controllers
 
             var query = _neoContext.Cypher
                 .Match("(t:Tutorial {Id:'" + tutorialId + "'})")
-                .Match("(t:User {Id:'" + currentUser.ToString() + "'})")
-                .Merge("(t)-[r:DOWNVOTED {Time: datetime()}]->(t)");
+                .Match("u:User {Id:'" + currentUser.ToString() + "'})")
+                .Merge("(u)-[r:DOWNVOTED {Time: datetime()}]->(t)");
             var queryText = query.Query.DebugQueryText;
             await query.ExecuteWithoutResultsAsync();
 
             return Ok();
         }
 
-        [HttpPut("isvoted/{tutorialid}")]
+        [HttpGet("isvoted/{tutorialid}")]
         public async Task<IActionResult> IsVoted(string tutorialId)
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
             var query = _neoContext.Cypher
                 .Match("(t:Tutorial {Id:'" + tutorialId + "'})")
-                .Match("(t:User {Id:'" + currentUser.ToString() + "'})")
-                .Return<int>("COUNT(*) > 0");
+                .OptionalMatch("(u:User {Id:'" + currentUser.ToString() + "'})-[up:UPVOTED]->(t)")
+                .OptionalMatch("(u)-[down:DOWNVOTED]->(t)")
+                .With("(count(up) > 0) as ups, (count(down) > 0) as downs")
+                .Return((ups, downs) => new
+                {
+                    Upvoted = ups.As<bool>(),
+                    Downvoted = downs.As<bool>()
+                });
             var queryText = query.Query.DebugQueryText;
 
             return Ok(await query.ResultsAsync);
@@ -199,7 +205,8 @@ namespace ExtraMessenger.Controllers
                     UserId = userId.As<string>(),
                     TutorialId = tutorialId.As<string>(),
                     Title = title.As<string>()
-                });
+                })
+                .Limit(10);
             var queryText = query.Query.DebugQueryText;
 
 
@@ -211,7 +218,30 @@ namespace ExtraMessenger.Controllers
         {
             ObjectId currentUser = ObjectId.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            return Ok();
+            DateTime dateTime = DateTime.UtcNow;
+            var beforeLimit = dateTime.AddDays(-5);
+            var beforeLimitString = beforeLimit.ToString("yyyy-MM-dd") + "T" + beforeLimit.ToString("HH:mm:ss.ff") + "Z";
+            var query = _neoContext.Cypher
+                .Match($"(u:User)-[up:UPVOTED]->(t:Tutorial)")
+                .Where($"(up.Time > datetime('{beforeLimitString}')) AND (NOT (u)-[:CREATED]->(t))")
+                .Match($"(c)-[:CREATED]->(t)")
+                .With($"count(up) as ups, c.Username AS username, c.Id as userId, t")
+                .OptionalMatch($"(u2:User)-[down:DOWNVOTED]->(t)")
+                .With($"ups, (ups * 10 - coalesce(count(down),0) * 2) as rating, username, userId, t.Id as tutorialId, t.Title as title")
+                .Where("rating >= 0")
+                .Return((username, rating, userId, tutorialId, title) => new
+                {
+                    Username = username.As<string>(),
+                    Rating = rating.As<int>(),
+                    UserId = userId.As<string>(),
+                    TutorialId = tutorialId.As<string>(),
+                    Title = title.As<string>()
+                })
+                .OrderByDescending("rating", "ups")
+                .Limit(5);
+            var queryText = query.Query.DebugQueryText;
+
+            return Ok(await query.ResultsAsync);
         }
 
         [HttpGet("basicstats")]

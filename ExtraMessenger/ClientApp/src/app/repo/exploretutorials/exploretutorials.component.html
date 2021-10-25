@@ -1,6 +1,6 @@
 <div class="main-container">
   <app-reposidebar></app-reposidebar>
-  <mat-divider></mat-divider>
+  <mat-divider [vertical]="true"></mat-divider>
   <!--
   <h2 style="color: white;">{{username | titlecase}}</h2>
   <strong style="color: white; margin-right: 10px;">branchanalyze works!</strong>-->
@@ -29,8 +29,7 @@
       </div>
     </div>
   </div>
-  <!--
-  <mat-divider></mat-divider>-->
+  <mat-divider [vertical]="true"></mat-divider>
 
   <div class="text-center flex-sidebar">
     <h2 class="text-orange">Recomended</h2>
@@ -61,15 +60,14 @@
       </ng-container>
     </div>
   </div>
-  <!--
-  <mat-divider></mat-divider>-->
+  <mat-divider [vertical]="true"></mat-divider>
 
   <div class="text-center flex-sidebar">
     <h2 class="text-orange">Hot</h2>
     <mat-divider></mat-divider>
     <div style="overflow-y: scroll; overflow-x: hidden;">
       <ng-container *ngFor="let h of (_hotTutorialsObserver | async) as hotTutorials">
-        <div (click)="goToTutorial(h.id)"
+        <div (click)="goToTutorial(h.tutorialId)"
              class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
           <div class="ml-2 mt-3 text-purple">
             <strong> {{h.title | titlecase}} </strong>

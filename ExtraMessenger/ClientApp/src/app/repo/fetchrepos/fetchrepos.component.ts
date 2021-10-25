@@ -34,12 +34,15 @@ export class FetchreposComponent implements OnInit {
   }
 
   fetchRepoInfo(id: any) {
+    /*
     let response = this.http.get<boolean>('https://localhost:5001/api/repo/fetchrepoinfo/' + id, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
       }
     });
     response.subscribe(x => console.log(x));
+    */
+    this.router.navigate(['../issuestats', id], { relativeTo: this.activatedRoute });
   }
 
   fetchrepos() {

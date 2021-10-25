@@ -2,23 +2,27 @@
   <app-reposidebar></app-reposidebar>
   <mat-divider [vertical]="true"></mat-divider>
   <div class="content-container">
-    <h2>{{tutorial.title}}</h2>
+    <h1 style="color: white;">{{tutorial.title | titlecase}}</h1>
+    <i style="color: white; margin-left: 10px;">by {{tutorial.owner}}</i>
+    <mat-divider ></mat-divider>
     <mat-list>
-      <mat-list-item> <span style="color: white; margin-left: 20px;">Topic: {{tutorial.topics[0]}}</span> </mat-list-item>
-      <mat-list-item> <span style="color: white; margin-left: 20px;">Difficulty: {{tutorial.difficulty}}</span> </mat-list-item>
+      <mat-list-item><strong style="color: white; margin-left: 20px;">Topic:</strong> <span style="color: white; margin-left: 20px;"> {{tutorialTopic}}</span> </mat-list-item>
+      <mat-list-item><strong style="color: white; margin-left: 20px;">Difficulty:</strong> <span style="color: white; margin-left: 20px;">{{tutorial.difficulty}}</span> </mat-list-item>
       <mat-list-item>
-        <button mat-icon-button color="accent" (click)="upvote()">
+        <button mat-icon-button color="accent" (click)="upvote()" [disabled]="_isUp || _isDown">
           <mat-icon>thumb_up_alt</mat-icon>
         </button>
+        <span style="color: white; margin-left: 5px;">{{tutorial.upvotes}}</span>
       </mat-list-item>
       <mat-list-item>
-        <button mat-icon-button color="accent" (click)="downvote()">
+        <button mat-icon-button color="accent" (click)="downvote()" [disabled]="_isUp || _isDown">
           <mat-icon>thumb_down_alt</mat-icon>
         </button>
+        <span style="color: white; margin-left: 5px;">{{tutorial.downvotes}}</span>
       </mat-list-item>
     </mat-list>
-    <h3>Introduction</h3>
-    <p>{{tutorial.introduction}}</p>
+    <h2 style="color: white;">Introduction</h2>
+    <p style="color: white;">{{tutorial.introduction}}</p>
     <button mat-stroked-button color="accent" (click)="goToRepo()">Go to example</button>
   </div>
 </div>
