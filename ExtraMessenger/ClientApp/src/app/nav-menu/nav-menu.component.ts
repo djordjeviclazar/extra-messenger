@@ -79,4 +79,8 @@ export class NavMenuComponent implements OnInit {
   navigateUsers() {
     this._router.navigate(['/chat/users']);
   }
+  
+  navigateRepoComponent() {
+    this._router.navigate(['/repo']);
+  }
 }

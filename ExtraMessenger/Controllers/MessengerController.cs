@@ -91,7 +91,7 @@ namespace ExtraMessenger.Controllers
             var update = Builders<User>.Update.Set(userOrigin => userOrigin.Contacts[-1].Seen, true);
             await userCollection.UpdateOneAsync(filter, update);
 
-            return Ok();
+            return Ok(update.ToJson());
         }
         /*ovo ne ovde
         [HttpPost("send/")]

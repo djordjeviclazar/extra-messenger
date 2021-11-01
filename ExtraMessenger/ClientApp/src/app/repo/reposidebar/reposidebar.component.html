@@ -1,0 +1,58 @@
+<div class="text-center flex-sidebar">
+  <h2 class="text-orange">Repos Menu</h2>
+  <mat-divider></mat-divider>
+  <ng-container>
+    <div style="overflow-y: hidden; overflow-x: hidden;">
+      <div (click)="navigateMyProfile()"
+           class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
+        <div class="ml-2 mt-3 text-purple">
+
+          <span class="material-icons" style="color: white; margin-left: 20px;">
+            person
+          </span>
+          <strong> Profile </strong>
+        </div>
+      </div>
+      <div (click)="navigateFetchRepos()"
+           class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
+        <div class="ml-2 mt-3 text-purple">
+
+          <span class="material-icons" style="color: white; margin-left: 20px;">
+            move_to_inbox
+          </span>
+          <strong> Fetch repos </strong>
+        </div>
+      </div>
+      <div (click)="navigateCreateTicket()"
+           class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
+        <div class="ml-2 mt-3 text-purple">
+
+          <span class="material-icons" style="color: white; margin-left: 20px;">
+            add
+          </span>
+          <strong> Create Ticket </strong>
+        </div>
+      </div>
+      <div (click)="navigateExloreTicket()"
+           class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
+        <div class="ml-2 mt-3 text-purple">
+
+          <span class="material-icons" style="color: white; margin-left: 20px;">
+            explore
+          </span>
+          <strong> Explore Tickets </strong>
+        </div>
+      </div>
+      <div (click)="navigateStatistics()"
+           class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
+        <div class="ml-2 mt-3 text-purple">
+
+          <span class="material-icons" style="color: white; margin-left: 20px;">
+            data_exploration
+          </span>
+          <strong> Statistics </strong>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

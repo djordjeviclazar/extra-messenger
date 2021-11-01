@@ -50,6 +50,11 @@ import { JwtModule } from '@auth0/angular-jwt';
         loadChildren: () => import('./chat/chat.module').then(m => m.ChatModule),
         canActivate: [AuthGuard]
       },
+      {
+        path: 'repo',
+        loadChildren: () => import('./repo/repo.module').then(m => m.RepoModule),
+        canActivate: [AuthGuard]
+      },
     ]),
     BrowserAnimationsModule,
     MatFormFieldModule,

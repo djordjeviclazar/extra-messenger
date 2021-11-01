@@ -20,12 +20,14 @@ namespace ExtraMessenger.Controllers
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IConfiguration _configuration;
+        
 
         public AuthenticationController(IAuthenticationService authenticationService,
             IConfiguration configuration)
         {
             _authenticationService = authenticationService;
             _configuration = configuration;
+            
         }
 
         [HttpPost("login")]
@@ -76,9 +78,10 @@ namespace ExtraMessenger.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, authenticatedUser.Username),
-                    new Claim(ClaimTypes.NameIdentifier, authenticatedUser.Id.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, authenticatedUser.Id.ToString()),
+                    new Claim(ClaimTypes.UserData, (authenticatedUser.OAuthToken ?? ""))
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddDays(14),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             };
             var createdToken = tokenHandler.CreateToken(tokenDescriptor);

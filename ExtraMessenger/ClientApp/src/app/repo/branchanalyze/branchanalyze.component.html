@@ -1,0 +1,23 @@
+<div class="main-container">
+  <app-reposidebar></app-reposidebar>
+  <mat-divider></mat-divider>
+  <!--
+  <h2 style="color: white;">{{username | titlecase}}</h2>
+  <strong style="color: white; margin-right: 10px;">branchanalyze works!</strong>-->
+  <div class="content-container">
+    <div class="text-center flex-sidebar">
+      <h2 class="text-orange">Branches Menu</h2>
+      <mat-divider></mat-divider>
+        <div style="overflow-y: scroll; overflow-x: hidden;">
+          <ng-container *ngFor="let b of (_branchObservable | async) as branches">
+            <div (click)="analyzeBranch(b.name)"
+                 class="row mb-2 ml-3 mr-3 shadow-sm p-1 rounded border border-primary contact">
+              <div class="ml-2 mt-3 text-purple">
+                <strong> {{b.name | titlecase}} </strong>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="main-container">
+  <app-reposidebar></app-reposidebar>
+  <mat-divider [vertical]="true"></mat-divider>
+  <div style="margin-left: 20px;">
+    <!--class="content-container"-->
+    <div>
+      <h2 style="color: white;">{{username | titlecase}}</h2>
+      <img width="200px" height="200px;" src="_imageUrl">
+      <br>
+      <span style="color: white; margin-left: 20px;">Rating: {{rating}}</span>
+    </div>
+    <div>
+      <strong style="color: white; margin-right: 10px;">Interests:</strong>
+      <br>
+      <ng-container *ngFor="let name of _interests">
+        <input type="checkbox" value="name" (change)="removeInterest(name)"> <span style="color: white; margin-right: 10px;">{{name}}</span>
+        <br>
+      </ng-container>
+    </div>
+    <div>
+      <strong style="color: white; margin-right: 10px;">Other topics:</strong>
+      <br>
+      <ng-container *ngFor="let name of _othertopics">
+        <input type="checkbox" value="name" (change)="addInterest(name)"> <span style="color: white; margin-right: 10px;">{{name}}</span>
+        <br>
+      </ng-container>
+    </div>
+    <br>
+    <div>
+      <mat-card *ngFor="let t of (_Tickets | async) as tArray" class="example-card">
+        <mat-card-header>
+          <mat-card-title>{{t.title | titlecase}}</mat-card-title>
+          <mat-card-subtitle>
+            <span style="color: white; margin-left: 20px;">Rating</span> {{t.rating}}
+          </mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+    </div>
+  </div>
+</div>

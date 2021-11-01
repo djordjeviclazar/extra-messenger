@@ -1,0 +1,52 @@
+
+<div class="main-container">
+  <app-reposidebar></app-reposidebar>
+  <button style="height:60px" color="secondary" mat-raised-button (click)="fetchrepos()">Fetch</button>
+  <div class="oldrepos">
+    <mat-card *ngFor="let repo of (oldReposObservable | async) as repos" class="example-card">
+      <mat-card-header>
+        <mat-card-title>{{repo.name}}</mat-card-title>
+        <mat-card-subtitle>
+          <div *ngIf="repo.isPublic; else elseBlock">
+            <span class="material-icons" style="color: white; margin-left: 20px;">lock_open</span> Public
+          </div>
+          <ng-template #elseBlock>
+            <span class="material-icons" style="color: white; margin-left: 20px;">lock</span> Private
+          </ng-template>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        Open issues: {{repo.openIssues}}
+      </mat-card-content>
+      <mat-card-actions>
+        <!--
+        <button color="primary" mat-raised-button (click)="fetchRepoInfo(repo.id)">Fetch/Sync Issues</button>
+        <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Issues</button>
+        <button color="primary" mat-raised-button (click)="goToPushes(repo.id)">Analyze Pushes</button> -->
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <div class="fetchedrepos">
+    <mat-card *ngFor="let repo of (reposObservable | async) as repos" class="example-card">
+      <mat-card-header>
+        <mat-card-title>{{repo.name}}</mat-card-title>
+        <mat-card-subtitle>
+          <div *ngIf="repo.isPublic; else elseBlock">
+            <span class="material-icons" style="color: white; margin-left: 20px;">lock_open</span> Public
+          </div>
+          <ng-template #elseBlock>
+            <span class="material-icons" style="color: white; margin-left: 20px;">lock</span> Private
+          </ng-template>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        Open issues: {{repo.openIssues}}
+      </mat-card-content>
+      <mat-card-actions>
+        <!-->
+          <button color="primary" mat-raised-button (click)="fetchRepoInfo(repo.id)">Fetch/Sync Issues</button>
+          <button color="primary" mat-raised-button (click)="goToBranches(repo.id)">Analyze Branches</button> -->
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>

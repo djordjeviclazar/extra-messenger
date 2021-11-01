@@ -4,19 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using ExtraMessenger.Data;
 using ExtraMessenger.Models;
+using ExtraMessenger.Models.Nodes;
 using ExtraMessenger.Services.Authentication.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Neo4jClient;
 
 namespace ExtraMessenger.Services.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
         private readonly MongoService _mongoService;
+        private readonly IGraphClient _graphClient;
 
-        public AuthenticationService(MongoService mongoService)
+        public AuthenticationService(MongoService mongoService,
+            IGraphClient graphClient)
         {
             _mongoService = mongoService;
+            _graphClient = graphClient;
         }
 
         public async Task<User> Login(string username, string password)
@@ -73,8 +78,15 @@ namespace ExtraMessenger.Services.Authentication
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 Username = username,
-                Id = ObjectId.GenerateNewId()
+                Id = ObjectId.GenerateNewId(),
+                Repositories = new List<Octokit.Repository>()
             };
+            /*
+            var query = _graphClient.Cypher.Merge("(n:User {Username:'" + username + "', Id:'" + registeredUser.Id.ToString() + "})")
+                                              .Return<UserNode>("n").Query.DebugQueryText;*/
+            var result = await _graphClient.Cypher.Merge("(n:User {Username:'" + username + "', Id:'" + registeredUser.Id.ToString() + "'})")
+                                              .Return<UserNode>("n")
+                                              .ResultsAsync;
 
             await userCollection.InsertOneAsync(registeredUser);
 
